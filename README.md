@@ -8,6 +8,18 @@ Carson Gabler:
 - 💼 **LinkedIn:** [linkedin.com/in/carsongabler](https://www.linkedin.com/in/carsongabler)  
 - 🌐 **GitHub:** [github.com/cbgabler](https://github.com/cbgabler)
 
+AJ Paumier:  
+- ✉️ **Email:** [paumiera@oregonstate.edu](mailto:paumiera@oregonstate.edu)
+
+Thien Tu:  
+- ✉️ **Email:** [tuthi@oregonstate.edu](mailto:tuthi@oregonstate.edu)
+
+Trey Springer:  
+- ✉️ **Email:** [springet@oregonstate.edu](mailto:springet@oregonstate.edu)
+
+Kristy Chen:  
+- ✉️ **Email:** [chenkr@oregonstate.edu](mailto:chenkr@oregonstate.edu)  
+
 ## Branching Strategy
 
 This project follows a structured branching strategy to ensure efficient collaboration and workflow:
