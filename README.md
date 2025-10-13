@@ -13,7 +13,7 @@ Carson Gabler:
 This project follows a structured branching strategy to ensure efficient collaboration and workflow:
 
 ### Branch Types
-1. **`main`**: Long-running branch for production-ready code. Controlled by OSU Foundation staff.  
+1. **`main`**: Long-running branch for production-ready code.  
 2. **`feat/[topic-name]`**: Feature-specific branches created from `main`. Use for implementing features or fixes.  
 3. **`feat/[topic-name]-topic/[subtopic-name]`**: Sub-branches for collaboration on feature parts. Created from `feat/[topic-name]`.  
 
