@@ -7,18 +7,23 @@ Carson Gabler:
 - ✉️ **Email:** [gablerc@oregonstate.edu](mailto:gablerc@oregonstate.edu)  
 - 💼 **LinkedIn:** [linkedin.com/in/carsongabler](https://www.linkedin.com/in/carsongabler)  
 - 🌐 **GitHub:** [github.com/cbgabler](https://github.com/cbgabler)
+- **Role:** Project Manager
 
 AJ Paumier:  
 - ✉️ **Email:** [paumiera@oregonstate.edu](mailto:paumiera@oregonstate.edu)
+- **Role:** Backend Software Developer
 
 Thien Tu:  
 - ✉️ **Email:** [tuthi@oregonstate.edu](mailto:tuthi@oregonstate.edu)
+- **Role:** Backend Software Developer
 
 Trey Springer:  
 - ✉️ **Email:** [springet@oregonstate.edu](mailto:springet@oregonstate.edu)
+- **Role:** Frontend Software Developer
 
 Kristy Chen:  
-- ✉️ **Email:** [chenkr@oregonstate.edu](mailto:chenkr@oregonstate.edu)  
+- ✉️ **Email:** [chenkr@oregonstate.edu](mailto:chenkr@oregonstate.edu)
+- **Role:** Frontend Software Developer
 
 ## Branching Strategy
 
