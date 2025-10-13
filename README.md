@@ -20,7 +20,7 @@ Thien Tu:
 Trey Springer:  
 - ✉️ **Email:** [springet@oregonstate.edu](mailto:springet@oregonstate.edu)
 - 💼 **LinkedIn:** [linkedin.com/in/treysp](https://www.linkedin.com/in/treysp/)
-- 🌐 **GitHub:** [[github.com/treyspringer](https://github.com/treyspringer)
+- 🌐 **GitHub:** [github.com/treyspringer](https://github.com/treyspringer)
 - **Role:** Frontend Software Developer
 
 Kristy Chen:  
