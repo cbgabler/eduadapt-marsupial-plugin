@@ -1,0 +1,15 @@
+{
+  "name": "ehr-electron",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "lint": "echo \"No lint configured\""
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "@electron-forge/cli": "^7.4.0"
+  }
+}
