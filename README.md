@@ -27,6 +27,14 @@ Kristy Chen:
 - ✉️ **Email:** [chenkr@oregonstate.edu](mailto:chenkr@oregonstate.edu)
 - **Role:** Frontend Software Developer
 
+## How to Run
+```
+cd src
+npm run dev
+cd ../electron
+npm start
+```
+
 ## Branching Strategy
 
 This project follows a structured branching strategy to ensure efficient collaboration and workflow:
