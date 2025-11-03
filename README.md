@@ -1,6 +1,8 @@
-# eduadapt-marsupial-plugin
+# ehr-module-simulator
 
-EduAdapt is an OSU/OHSU collaboration aimed at extending [Marsupial EHR](https://marsupialemr.com/), an open-source electronic health records (EHR) platform, with a customizable learning plugin for nursing education.
+The EHR Module Simulator is designed to help nursing students at OHSU practice real-world clinical decision-making and documentation in a simulated Electronic Health Record (EHR) environment.
+
+This project provides specialty learning modules that mirror realistic patient care scenarios used in clinical learning labs. Students can interact with simulated patient charts, review provider orders, interpret clinical data, and perform virtual actions such as titrating medications or documenting care, just as they would in a real EHR system.
 
 ## Contact  
 Carson Gabler:  
