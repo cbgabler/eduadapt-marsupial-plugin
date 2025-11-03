@@ -1,0 +1,50 @@
+name: Deploy React/Electron Environment
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        options: [dev, prod] ## change once i have dev/prod setup
+        default: dev
+
+jobs:
+  build:
+    runs-on: [ self-hosted, linux, x64 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Download Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Install React Dependencies
+        shell: bash
+        run: |
+          cd frontend
+          npm ci
+      
+      - name: Build React
+        shell: bash
+        run: |
+          cd frontend
+          npm run build
+      
+      - name: Install Electron Dependencies
+        shell: bash
+        run: |
+          cd electron
+          npm ci
+        
+      - name: Copy React Build -> Electron Dir
+        shell: bash
+        run: |
+          cp -r frontend/build electron/
+      
+      - name: Build Electron
+        shell: bash
+        run: |
+          cd electron
+          npx electron-builder --linux AppImage
