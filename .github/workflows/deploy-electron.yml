@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           cd frontend
-          npm ci
+          npm install
       
       - name: Build React
         shell: bash
@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           cd electron
-          npm ci
+          npm install
         
       - name: Copy React Build -> Electron Dir
         shell: bash
