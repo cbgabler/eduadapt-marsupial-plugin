@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: [ self-hosted, linux, x64 ]
+    runs-on: ubuntu-latest ## might change back to self-hosted after testing
     steps:
       - name: Checkout
         uses: actions/checkout@v4
