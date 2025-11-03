@@ -1,0 +1,1 @@
+This is the current documentation folder for the project. Please reference contributions.md and all current documents before making any pull requests.
