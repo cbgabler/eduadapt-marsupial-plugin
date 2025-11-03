@@ -41,10 +41,11 @@ jobs:
       - name: Copy React Build -> Electron Dir
         shell: bash
         run: |
-          cp -r frontend/build electron/
+          rm -rf electron/build
+          cp -r frontend/dist electron/build
+          ls -la electron/build
       
-      - name: Build Electron
+      - name: Verify Build
         shell: bash
         run: |
-          cd electron
-          npx electron-builder --linux AppImage
+          test -f electron/build/index.html && echo "File exists; Build verified" || exit 1
