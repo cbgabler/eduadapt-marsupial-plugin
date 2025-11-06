@@ -1,8 +1,8 @@
-#Contributing Guide
+# Contributing Guide
 How to set up, code, test, review, and release so contributions meet our Definition
 of Done.
 
-##Code of Conduct
+## Code of Conduct
 
 ### Our Pledge
 We are committed to providing a welcoming and accessible experience for everyone regardless of background or identity.
