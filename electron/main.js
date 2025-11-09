@@ -20,6 +20,8 @@ function createWindow() {
     },
   });
 
+  const isDev = !app.isPackaged;
+
   if (isDev) {
     win.loadURL("http://localhost:5173");
     win.webContents.openDevTools();
@@ -28,37 +30,14 @@ function createWindow() {
   }
 }
 
-// IPC handlers for local DB
-ipcMain.handle(
-  "register-user",
-  async (event, { first_name, last_name, username, email }) => {
-    try {
-      console.log("Registering user:", {
-        first_name,
-        last_name,
-        username,
-        email,
-      });
-      const userId = registerUser(first_name, last_name, username, email);
-      console.log("User registered successfully with ID:", userId);
-      return { success: true, userId };
-    } catch (error) {
-      console.error("Error registering user:", error);
-      return { success: false, error: error.message };
-    }
-  }
-);
-
-// Initialize database and create window when app is ready
-app.whenReady().then(async () => {
-  initDatabase();
+app.whenReady().then(() => {
   createWindow();
 
-  app.on("activate", () => {
+  app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
 });
