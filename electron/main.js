@@ -9,6 +9,27 @@ const __dirname = path.dirname(__filename);
 
 const isDev = !app.isPackaged; // for dev vs prod, should be changed later
 
+// IPC handlers
+ipcMain.handle(
+  "register-user",
+  async (event, { first_name, last_name, username, email }) => {
+    try {
+      console.log("Registering user:", {
+        first_name,
+        last_name,
+        username,
+        email,
+      });
+      const userId = registerUser(first_name, last_name, username, email);
+      console.log("User registered successfully with ID:", userId);
+      return { success: true, userId };
+    } catch (error) {
+      console.error("Error registering user:", error);
+      return { success: false, error: error.message };
+    }
+  }
+);
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
@@ -20,8 +41,6 @@ function createWindow() {
     },
   });
 
-  const isDev = !app.isPackaged;
-
   if (isDev) {
     win.loadURL("http://localhost:5173");
     win.webContents.openDevTools();
@@ -30,14 +49,16 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(() => {
+// Initialize database and create window when app is ready
+app.whenReady().then(async () => {
+  initDatabase();
   createWindow();
 
-  app.on('activate', () => {
+  app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
