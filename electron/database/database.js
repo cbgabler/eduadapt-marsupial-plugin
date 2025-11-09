@@ -18,13 +18,14 @@ export function initDatabase() {
       last_name VARCHAR,
       username TEXT UNIQUE,
       email VARCHAR UNIQUE
-    )
+    );
 
     CREATE TABLE IF NOT EXISTS scenarios (
       id INTEGER PRIMARY KEY,
-      name TEXT, definition TEXT, 
+      name TEXT, 
+      definition TEXT, 
       createdBy INTEGER
-    )
+    );
 
     CREATE TABLE IF NOT EXISTS sessions (
       id INTEGER PRIMARY KEY,
@@ -32,7 +33,7 @@ export function initDatabase() {
       userId INTEGER,
       started datetime,
       ended datetime
-    )
+    );
   `);
 
   return db;
@@ -42,4 +43,5 @@ export function getDb() {
   if (!db) {
     throw new Error('DB failed to initialize.')
   }
+  return db;
 }
