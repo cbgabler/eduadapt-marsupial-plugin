@@ -1,8 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
-const isDev = !app.isPackaged; // for dev vs prod, should be changed later
-
 function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
@@ -12,6 +10,8 @@ function createWindow() {
     },
   });
 
+  const isDev = !app.isPackaged;
+
   if (isDev) {
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
@@ -20,14 +20,18 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(() => {
-  createWindow();
+if (require.main === module) {
+  app.whenReady().then(() => {
+    createWindow();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
   });
-});
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit();
+  });
+}
+
+module.exports = { createWindow };
