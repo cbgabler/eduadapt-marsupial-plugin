@@ -1,33 +1,46 @@
-jest.mock('electron', () => {
-  const createMockWindow = () => ({
-    loadURL: jest.fn(),
-    loadFile: jest.fn(),
-    webContents: {
-      openDevTools: jest.fn(),
-    },
-  });
+import { jest } from "@jest/globals";
 
-  const mockBrowserWindow = jest.fn(() => createMockWindow());
-
-  const mockApp = {
-    whenReady: jest.fn(() => Promise.resolve()),
-    on: jest.fn(),
-    quit: jest.fn(),
-    get isPackaged() {
-      return global.__TEST_IS_PACKAGED__ ?? false;
-    },
-  };
-
-  return {
-    app: mockApp,
-    BrowserWindow: mockBrowserWindow,
-  };
+const createMockWindow = () => ({
+  loadURL: jest.fn(),
+  loadFile: jest.fn(),
+  webContents: {
+    openDevTools: jest.fn(),
+  },
 });
 
-const electron = require('electron');
-const { createWindow } = require('../main');
+const mockBrowserWindow = jest.fn(() => createMockWindow());
 
-describe('createWindow', () => {
+const mockApp = {
+  whenReady: jest.fn(() => Promise.resolve()),
+  on: jest.fn(),
+  quit: jest.fn(),
+  getPath: jest.fn(() => "/tmp/test-user-data"),
+  get isPackaged() {
+    return global.__TEST_IS_PACKAGED__ ?? false;
+  },
+};
+
+await jest.unstable_mockModule("electron", () => ({
+  app: mockApp,
+  BrowserWindow: mockBrowserWindow,
+  ipcMain: {
+    handle: jest.fn(),
+  },
+}));
+
+await jest.unstable_mockModule("../database/database.js", () => ({
+  initDatabase: jest.fn(),
+  getDb: jest.fn(),
+}));
+
+await jest.unstable_mockModule("../database/dataStore.js", () => ({
+  registerUser: jest.fn(),
+}));
+
+const electron = await import("electron");
+const { createWindow } = await import("../main.js");
+
+describe("createWindow", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -36,7 +49,7 @@ describe('createWindow', () => {
     delete global.__TEST_IS_PACKAGED__;
   });
 
-  test('loads dev server upon run', () => {
+  test("loads dev server upon run", () => {
     global.__TEST_IS_PACKAGED__ = false;
 
     createWindow();
@@ -44,9 +57,11 @@ describe('createWindow', () => {
     expect(electron.BrowserWindow).toHaveBeenCalledTimes(1);
 
     const windowInstance =
-      electron.BrowserWindow.mock.results[electron.BrowserWindow.mock.results.length - 1]
-        .value;
-    expect(windowInstance.loadURL).toHaveBeenCalledWith('http://localhost:5173');
+      electron.BrowserWindow.mock.results[
+        electron.BrowserWindow.mock.results.length - 1
+      ].value;
+    expect(windowInstance.loadURL).toHaveBeenCalledWith(
+      "http://localhost:5173"
+    );
   });
-
 });
