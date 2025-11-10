@@ -1,6 +1,6 @@
 import { getDb } from './database.js';
 
-let sessions = {}
+let sessions = {};
 
 // These arent really important to the current sprint.
 

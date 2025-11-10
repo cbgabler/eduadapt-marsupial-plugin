@@ -1,14 +1,14 @@
-import { useState } from "react";
-import "./RegisterForm.css";
+import { useState } from 'react';
+import './RegisterForm.css';
 
 function RegisterForm() {
   const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    username: "",
-    email: "",
+    first_name: '',
+    last_name: '',
+    username: '',
+    email: '',
   });
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -17,19 +17,19 @@ function RegisterForm() {
       ...prev,
       [name]: value,
     }));
-    setMessage(""); // Clear message when user types
+    setMessage(''); // Clear message when user types
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setMessage("");
+    setMessage('');
 
     try {
       // Check if window.api exists (Electron context)
       if (!window.api || !window.api.registerUser) {
         setMessage(
-          "Error: Electron API not available. Please run this in Electron."
+          'Error: Electron API not available. Please run this in Electron.'
         );
         setIsLoading(false);
         return;
@@ -41,16 +41,16 @@ function RegisterForm() {
         setMessage(`Success! User registered with ID: ${result.userId}`);
         // Reset form
         setFormData({
-          first_name: "",
-          last_name: "",
-          username: "",
-          email: "",
+          first_name: '',
+          last_name: '',
+          username: '',
+          email: '',
         });
       } else {
-        setMessage(`Error: ${result.error || "Registration failed"}`);
+        setMessage(`Error: ${result.error || 'Registration failed'}`);
       }
     } catch (error) {
-      setMessage(`Error: ${error.message || "An unexpected error occurred"}`);
+      setMessage(`Error: ${error.message || 'An unexpected error occurred'}`);
     } finally {
       setIsLoading(false);
     }
@@ -109,13 +109,13 @@ function RegisterForm() {
         </div>
 
         <button type="submit" disabled={isLoading} className="submit-button">
-          {isLoading ? "Registering..." : "Register"}
+          {isLoading ? 'Registering...' : 'Register'}
         </button>
 
         {message && (
           <div
             className={`message ${
-              message.includes("Error") ? "error" : "success"
+              message.includes('Error') ? 'error' : 'success'
             }`}
           >
             {message}

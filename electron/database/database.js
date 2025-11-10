@@ -41,7 +41,7 @@ export function initDatabase() {
 
 export function getDb() {
   if (!db) {
-    throw new Error('DB failed to initialize.')
+    throw new Error('DB failed to initialize.');
   }
   return db;
 }
