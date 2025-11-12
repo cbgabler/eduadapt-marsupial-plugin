@@ -1,27 +1,104 @@
-import RegisterForm from './RegisterForm.jsx';
-import Modules from './Modules.jsx'
-import './App.css';
+import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 
-import Dropdown from 'react-bootstrap/Dropdown';
-import Nav from 'react-bootstrap/Nav';
+import RegisterForm from "./Users/RegisterForm.jsx";
+import Home from "./Home.jsx";
+//import Modules from "./Modules.jsx";
+import "./App.css";
+
+function Navigation() {
+  const location = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
+  return (
+    <div className="app-navigation">
+      <nav>
+        <ul className="nav">
+          <li className="nav-item">
+            <Link
+              to="/home"
+              className={`nav-link ${
+                location.pathname === "/home" || location.pathname === "/"
+                  ? "active"
+                  : ""
+              }`}
+            >
+              Home
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link
+              to="/RegisterForm"
+              className={`nav-link ${
+                location.pathname === "/RegisterForm" ? "active" : ""
+              }`}
+            >
+              Register
+            </Link>
+          </li>
+          <li className="nav-item dropdown" ref={dropdownRef}>
+            <button
+              className="dropdown-toggle"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              aria-expanded={dropdownOpen}
+            >
+              SignIn
+            </button>
+            {dropdownOpen && (
+              <div className="dropdown-menu">
+                <Link
+                  to="/SignIn"
+                  className="dropdown-item"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  SignIn
+                </Link>
+                <Link
+                  to="/SignUp"
+                  className="dropdown-item"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  SignUp
+                </Link>
+              </div>
+            )}
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
+}
 
 function App() {
   return (
-    <Nav
-      activeKey="/home"
-      onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}
-    >
-      <Nav.Item as='li'>
-        <Nav.Link href="/home">Home</Nav.Link>
-      </Nav.Item>
-      <Nav.Item as='li'>
-        <Nav.Link href="/RegisterForm">Register</Nav.Link>
-      </Nav.Item>
-      <Nav.Dropdown title="SignIn" id="signin-dropdown">
-        <Nav.Link href="/SignIn">SignIn</Nav.Link>
-        <Nav.Link href="/SignUp">SignUp</Nav.Link>
-      </Nav.Dropdown>
-    </Nav>
+    <BrowserRouter>
+      <Navigation />
+      <div className="app-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/RegisterForm" element={<RegisterForm />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
