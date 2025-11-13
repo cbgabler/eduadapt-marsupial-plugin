@@ -17,6 +17,7 @@ export function initDatabase() {
       first_name VARCHAR,
       last_name VARCHAR,
       username TEXT UNIQUE,
+      role enum('student', 'instructor', 'admin') DEFAULT 'student',
       email VARCHAR UNIQUE
     );
 
@@ -24,12 +25,25 @@ export function initDatabase() {
       id INTEGER PRIMARY KEY,
       name TEXT, 
       definition TEXT, 
-      createdBy INTEGER
     );
+
+    CREATE TABLE IF NOT EXISTS scenario_states (
+      id INTEGER PRIMARY KEY,
+      scenarioId INTEGER FOREIGN KEY REFERENCES scenarios(id),
+      createdBy INTEGER FOREIEGN KEY REFERENCES users(id),
+      isPublished BOOLEAN DEFAULT FALSE,
+      publishDate DATETIME
+    );
+
+    CREATE TABLE IF NOT EXISTS scenario_tabs (
+      id
+      scenarioId INTEGER FOREIGN KEY REFERENCES scenarios(id),
+
+    )
 
     CREATE TABLE IF NOT EXISTS sessions (
       id INTEGER PRIMARY KEY,
-      scenarioId INTEGER,
+      scenarioId INTEGER FOREIGN KEY REFERENCES scenarios(id),
       userId INTEGER,
       started datetime,
       ended datetime
@@ -41,7 +55,7 @@ export function initDatabase() {
 
 export function getDb() {
   if (!db) {
-    throw new Error('DB failed to initialize.');
+    throw new error('DB failed to initialize.');
   }
   return db;
 }

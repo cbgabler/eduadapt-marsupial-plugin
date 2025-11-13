@@ -24,6 +24,17 @@ export function registerUser(first_name, last_name, username, email) {
   return info.lastInsertRowid;
 }
 
+export function createScenario(name, definition, createdBy) {
+  const db = getDb();
+
+  const stmt = db.prepare(`
+    INSERT INTO scenarios (name, definition, createdBy) VALUES (?, ?, ?);
+  `);
+
+  const info = stmt.run(name, definition, createdBy);
+  return info.lastInsertRowid;
+}
+
 /*
 All update functions
 */
