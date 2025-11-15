@@ -1,15 +1,15 @@
-import path from 'path';
-import { app } from 'electron';
-import Database from 'better-sqlite3';
-import { error } from 'console';
+import path from "path";
+import { app } from "electron";
+import Database from "better-sqlite3";
+import { error } from "console";
 
 let db;
 
 // Initializes the current database if it doesn't already exist
 export function initDatabase() {
-  const dbPath = path.join(app.getPath('userData'), 'ehr_sim.db');
+  const dbPath = path.join(app.getPath("userData"), "ehr_sim.db");
   db = new Database(dbPath);
-  
+
   // Build table if not exists
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
@@ -17,36 +17,43 @@ export function initDatabase() {
       first_name VARCHAR,
       last_name VARCHAR,
       username TEXT UNIQUE,
-      role enum('student', 'instructor', 'admin') DEFAULT 'student',
+      role TEXT DEFAULT 'student' CHECK(role IN ('student', 'instructor', 'admin')),
       email VARCHAR UNIQUE
     );
 
     CREATE TABLE IF NOT EXISTS scenarios (
       id INTEGER PRIMARY KEY,
       name TEXT, 
-      definition TEXT, 
+      definition TEXT
     );
 
     CREATE TABLE IF NOT EXISTS scenario_states (
       id INTEGER PRIMARY KEY,
-      scenarioId INTEGER FOREIGN KEY REFERENCES scenarios(id),
-      createdBy INTEGER FOREIEGN KEY REFERENCES users(id),
-      isPublished BOOLEAN DEFAULT FALSE,
-      publishDate DATETIME
+      scenarioId INTEGER,
+      createdBy INTEGER,
+      isPublished BOOLEAN DEFAULT 0,
+      publishDate DATETIME,
+      FOREIGN KEY (scenarioId) REFERENCES scenarios(id),
+      FOREIGN KEY (createdBy) REFERENCES users(id)
     );
 
     CREATE TABLE IF NOT EXISTS scenario_tabs (
-      id
-      scenarioId INTEGER FOREIGN KEY REFERENCES scenarios(id),
-
-    )
+      id INTEGER PRIMARY KEY,
+      scenarioId INTEGER,
+      name TEXT,
+      content TEXT,
+      orderIndex INTEGER,
+      FOREIGN KEY (scenarioId) REFERENCES scenarios(id)
+    );
 
     CREATE TABLE IF NOT EXISTS sessions (
       id INTEGER PRIMARY KEY,
-      scenarioId INTEGER FOREIGN KEY REFERENCES scenarios(id),
+      scenarioId INTEGER,
       userId INTEGER,
-      started datetime,
-      ended datetime
+      started DATETIME,
+      ended DATETIME,
+      FOREIGN KEY (scenarioId) REFERENCES scenarios(id),
+      FOREIGN KEY (userId) REFERENCES users(id)
     );
   `);
 
@@ -55,7 +62,7 @@ export function initDatabase() {
 
 export function getDb() {
   if (!db) {
-    throw new error('DB failed to initialize.');
+    throw new error("DB failed to initialize.");
   }
   return db;
 }

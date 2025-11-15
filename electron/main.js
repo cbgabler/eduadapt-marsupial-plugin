@@ -2,7 +2,12 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { initDatabase } from "./database/database.js";
-import { registerUser } from "./database/dataStore.js";
+import {
+  registerUser,
+  getAllScenarios,
+  getScenarioById,
+} from "./database/dataModels.js";
+import { seedExampleScenarios } from "./database/exampleScenarios.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +35,30 @@ ipcMain.handle(
   }
 );
 
+// Scenario handlers
+ipcMain.handle("get-all-scenarios", async () => {
+  try {
+    const scenarios = getAllScenarios();
+    return { success: true, scenarios };
+  } catch (error) {
+    console.error("Error getting scenarios:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("get-scenario", async (event, scenarioId) => {
+  try {
+    const scenario = getScenarioById(scenarioId);
+    if (!scenario) {
+      return { success: false, error: "Scenario not found" };
+    }
+    return { success: true, scenario };
+  } catch (error) {
+    console.error("Error getting scenario:", error);
+    return { success: false, error: error.message };
+  }
+});
+
 export function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
@@ -52,6 +81,16 @@ export function createWindow() {
 // Initialize database and create window when app is ready
 app.whenReady().then(async () => {
   initDatabase();
+
+  // Seed example scenarios in development mode
+  if (isDev) {
+    try {
+      await seedExampleScenarios();
+    } catch (error) {
+      console.error("Error seeding example scenarios:", error);
+    }
+  }
+
   createWindow();
 
   app.on("activate", () => {

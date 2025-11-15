@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 
-import RegisterForm from "./Users/RegisterForm.jsx";
+import RegisterForm from "./users/RegisterForm.jsx";
 import Home from "./Home.jsx";
 //import Modules from "./Modules.jsx";
 import "./App.css";
