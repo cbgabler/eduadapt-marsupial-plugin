@@ -41,6 +41,12 @@ jobs:
         run: |
           cd electron
           npm install
+
+      - name: Run Electron Tests
+        shell: bash
+        run: |
+          cd electron
+          npm test
         
       - name: Copy React Build -> Electron Dir
         shell: bash
