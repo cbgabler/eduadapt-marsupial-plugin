@@ -8,6 +8,7 @@ import {
   getScenarioById,
 } from "./database/dataModels.js";
 import { seedExampleScenarios } from "./database/exampleScenarios.js";
+import { importData } from "./database/progess/import.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,6 +59,14 @@ ipcMain.handle("get-scenario", async (event, scenarioId) => {
     return { success: false, error: error.message };
   }
 });
+
+// Import & Export handlers
+// use this when have more time https://www.electronjs.org/docs/latest/api/dialog
+ipcMain.handle("import-file", async ()) => {
+  try {
+    const
+  }
+}
 
 export function createWindow() {
   const win = new BrowserWindow({

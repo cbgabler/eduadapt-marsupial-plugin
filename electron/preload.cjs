@@ -32,6 +32,15 @@ contextBridge.exposeInMainWorld("api", {
       return { success: false, error: error.message };
     }
   },
+  // Fix
+  // importFile: () => {
+  //   try {
+  //     return ipcRenderer.invoke("");
+  //   } catch (error) {
+  //     console.error("IPC error:", error);
+  //     return { success: false, error: error.message}
+  //   }
+  // }
 });
 
 console.log("API exposed to window.api");
