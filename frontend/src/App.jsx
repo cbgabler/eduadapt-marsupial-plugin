@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 
 import RegisterForm from "./RegisterForm";
 import Home from "./Home";
+import Scenarios from "./scenarios/Scenarios";
 //import Modules from "./Modules.jsx";
 import "./App.css";
 
@@ -42,6 +43,16 @@ function Navigation() {
               }`}
             >
               Home
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link
+              to="/Scenarios"
+              className={`nav-link ${
+                location.pathname === "/Scenarios" ? "active" : ""
+              }`}
+            >
+              Scenarios
             </Link>
           </li>
           <li className="nav-item">
@@ -96,6 +107,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/RegisterForm" element={<RegisterForm />} />
+          <Route path="/Scenarios" element={<Scenarios />} />
         </Routes>
       </div>
     </BrowserRouter>
