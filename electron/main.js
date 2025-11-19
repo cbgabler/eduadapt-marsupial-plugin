@@ -62,11 +62,11 @@ ipcMain.handle("get-scenario", async (event, scenarioId) => {
 
 // Import & Export handlers
 // use this when have more time https://www.electronjs.org/docs/latest/api/dialog
-ipcMain.handle("import-file", async ()) => {
-  try {
-    const
-  }
-}
+// ipcMain.handle("import-file", async ()) => {
+//   try {
+//     const
+//   }
+// }
 
 export function createWindow() {
   const win = new BrowserWindow({

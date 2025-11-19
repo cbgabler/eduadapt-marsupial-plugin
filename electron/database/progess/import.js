@@ -1,5 +1,5 @@
-import { getDb } from "../database";
-import { error } from "console";
+import { getDb } from '../database.js';
+import { error } from 'console';
 
 // Import custom scenarios created by educators
 export function importData() {

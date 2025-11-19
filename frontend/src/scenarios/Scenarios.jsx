@@ -83,6 +83,16 @@ function Scenarios() {
 
   return (
     <div className="page-container">
+      <div className="export-buttons">
+        <button onClick={window.api.export}>
+          Export
+        </button>
+      </div>
+      <div className="export-buttons">
+        <button onClick={window.api.import}>
+          Import
+        </button>
+      </div>
       <div className="scenarios-header">
         <h1>Available Scenarios</h1>
         <p className="scenarios-subtitle">
