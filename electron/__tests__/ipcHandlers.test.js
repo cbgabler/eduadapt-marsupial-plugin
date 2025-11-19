@@ -43,11 +43,21 @@ async function loadMainWithScenarioMocks() {
   await jest.unstable_mockModule("../database/exampleScenarios.js", () => ({
     seedExampleScenarios: jest.fn(),
   }));
+  const simulationMocks = {
+    startSession: jest.fn(),
+    getSessionState: jest.fn(),
+    adjustMedication: jest.fn(),
+    pauseSession: jest.fn(),
+    resumeSession: jest.fn(),
+    endSession: jest.fn(),
+  };
+
+  await jest.unstable_mockModule("../database/simulation.js", () => simulationMocks);
 
   const electron = await import("electron");
   await import("../main.js");
 
-  return { electron, dataModelMocks, mockIpcHandle };
+  return { electron, dataModelMocks, mockIpcHandle, simulationMocks };
 }
 
 const findHandler = (ipcMock, channel) => {
@@ -124,5 +134,103 @@ describe("scenario IPC handlers", () => {
     const response = await handler(null, 9);
 
     expect(response).toEqual({ success: false, error: "boom" });
+  });
+});
+
+describe("simulation IPC handlers", () => {
+  test("start-sim returns session data", async () => {
+    const { mockIpcHandle, simulationMocks } =
+      await loadMainWithScenarioMocks();
+    const sessionState = { status: "running" };
+    simulationMocks.startSession.mockReturnValueOnce({
+      sessionId: 12,
+      state: sessionState,
+    });
+
+    const handler = findHandler(mockIpcHandle, "start-sim");
+    const result = await handler(null, { scenarioId: 3, userId: 9 });
+
+    expect(simulationMocks.startSession).toHaveBeenCalledWith(3, 9);
+    expect(result).toEqual({ success: true, sessionId: 12, state: sessionState });
+  });
+
+  test("start-sim reports errors", async () => {
+    const { mockIpcHandle, simulationMocks } =
+      await loadMainWithScenarioMocks();
+    simulationMocks.startSession.mockImplementation(() => {
+      throw new Error("nope");
+    });
+
+    const handler = findHandler(mockIpcHandle, "start-sim");
+    const result = await handler(null, { scenarioId: 3, userId: 9 });
+
+    expect(result).toEqual({ success: false, error: "nope" });
+  });
+
+  test("get-sim-state proxies to session manager", async () => {
+    const { mockIpcHandle, simulationMocks } =
+      await loadMainWithScenarioMocks();
+    const state = { tickCount: 2 };
+    simulationMocks.getSessionState.mockReturnValueOnce(state);
+
+    const handler = findHandler(mockIpcHandle, "get-sim-state");
+    const result = await handler(null, { sessionId: 55 });
+
+    expect(simulationMocks.getSessionState).toHaveBeenCalledWith(55);
+    expect(result).toEqual({ success: true, state });
+  });
+
+  test("adjust-sim-medication validates numeric dose", async () => {
+    const { mockIpcHandle, simulationMocks } =
+      await loadMainWithScenarioMocks();
+    const state = { tickCount: 5 };
+    simulationMocks.adjustMedication.mockReturnValueOnce(state);
+
+    const handler = findHandler(mockIpcHandle, "adjust-sim-medication");
+    const payload = { sessionId: 1, medicationId: "med", newDose: 12 };
+    const result = await handler(null, payload);
+
+    expect(simulationMocks.adjustMedication).toHaveBeenCalledWith(
+      payload.sessionId,
+      payload.medicationId,
+      payload.newDose
+    );
+    expect(result).toEqual({ success: true, state });
+  });
+
+  test("pause-sim and resume-sim invoke matching helpers", async () => {
+    const { mockIpcHandle, simulationMocks } =
+      await loadMainWithScenarioMocks();
+    const paused = { status: "paused" };
+    const resumed = { status: "running" };
+    simulationMocks.pauseSession.mockReturnValueOnce(paused);
+    simulationMocks.resumeSession.mockReturnValueOnce(resumed);
+
+    const pauseHandler = findHandler(mockIpcHandle, "pause-sim");
+    const resumeHandler = findHandler(mockIpcHandle, "resume-sim");
+
+    expect(await pauseHandler(null, { sessionId: 9 })).toEqual({
+      success: true,
+      state: paused,
+    });
+    expect(await resumeHandler(null, { sessionId: 9 })).toEqual({
+      success: true,
+      state: resumed,
+    });
+  });
+
+  test("end-sim stops the session and returns final state", async () => {
+    const { mockIpcHandle, simulationMocks } =
+      await loadMainWithScenarioMocks();
+    const finalState = { status: "ended" };
+    simulationMocks.endSession.mockReturnValueOnce(finalState);
+
+    const handler = findHandler(mockIpcHandle, "end-sim");
+    const result = await handler(null, { sessionId: 5 });
+
+    expect(simulationMocks.endSession).toHaveBeenCalledWith(5, {
+      reason: "user_end",
+    });
+    expect(result).toEqual({ success: true, state: finalState });
   });
 });
