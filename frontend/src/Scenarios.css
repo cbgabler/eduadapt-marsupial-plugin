@@ -229,6 +229,90 @@
     color: #991b1b;
   }
 
+  .notes-panel {
+    margin-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .note-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .note-form textarea {
+    border-radius: 0.5rem;
+    border: 1px solid #cbd5f5;
+    padding: 0.75rem;
+    resize: vertical;
+  }
+
+  .note-form button {
+    align-self: flex-end;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .note-form button:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+  }
+
+  .notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .note-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fff;
+  }
+
+  .note-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+  }
+
+  .note-actions {
+    margin-top: 0.35rem;
+    text-align: right;
+  }
+
+  .note-actions button {
+    border: none;
+    background: #ef4444;
+    color: #fff;
+    border-radius: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  .note-actions button:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+  }
+
+  .notes-empty {
+    color: #94a3b8;
+    font-style: italic;
+  }
+
   .target-banner {
     margin-bottom: 1rem;
     padding: 0.85rem 1rem;

@@ -25,6 +25,9 @@ async function loadMainWithScenarioMocks() {
     registerUser: jest.fn(),
     getAllScenarios: jest.fn(),
     getScenarioById: jest.fn(),
+    addSessionNote: jest.fn(),
+    getSessionNotes: jest.fn(),
+    deleteSessionNote: jest.fn(),
   };
 
   await jest.unstable_mockModule("electron", () => ({
@@ -50,6 +53,7 @@ async function loadMainWithScenarioMocks() {
     pauseSession: jest.fn(),
     resumeSession: jest.fn(),
     endSession: jest.fn(),
+    getSession: jest.fn(),
   };
 
   await jest.unstable_mockModule("../database/simulation.js", () => simulationMocks);
@@ -232,5 +236,57 @@ describe("simulation IPC handlers", () => {
       reason: "user_end",
     });
     expect(result).toEqual({ success: true, state: finalState });
+  });
+});
+
+describe("documentation IPC handlers", () => {
+  test("add-note stores note via data model", async () => {
+    const { mockIpcHandle, dataModelMocks, simulationMocks } =
+      await loadMainWithScenarioMocks();
+    simulationMocks.getSession.mockReturnValueOnce({ id: 7 });
+    const savedNote = { id: 1, content: "note" };
+    dataModelMocks.addSessionNote.mockReturnValueOnce(savedNote);
+
+    const handler = findHandler(mockIpcHandle, "add-note");
+    const payload = {
+      sessionId: 5,
+      userId: 3,
+      content: "note",
+      vitalsSnapshot: { heartRate: 90 },
+    };
+    const result = await handler(null, payload);
+
+    expect(simulationMocks.getSession).toHaveBeenCalledWith(5);
+    expect(dataModelMocks.addSessionNote).toHaveBeenCalledWith(payload);
+    expect(result).toEqual({ success: true, note: savedNote });
+  });
+
+  test("get-notes returns session notes", async () => {
+    const { mockIpcHandle, dataModelMocks } =
+      await loadMainWithScenarioMocks();
+    const notes = [{ id: 1, content: "note" }];
+    dataModelMocks.getSessionNotes.mockReturnValueOnce(notes);
+
+    const handler = findHandler(mockIpcHandle, "get-notes");
+    const result = await handler(null, { sessionId: 3 });
+
+    expect(dataModelMocks.getSessionNotes).toHaveBeenCalledWith(3);
+    expect(result).toEqual({ success: true, notes });
+  });
+
+  test("delete-note removes note when authorized", async () => {
+    const { mockIpcHandle, dataModelMocks } =
+      await loadMainWithScenarioMocks();
+    const note = { id: 2, content: "note" };
+    dataModelMocks.deleteSessionNote.mockReturnValueOnce(note);
+
+    const handler = findHandler(mockIpcHandle, "delete-note");
+    const result = await handler(null, { noteId: 2, userId: 3 });
+
+    expect(dataModelMocks.deleteSessionNote).toHaveBeenCalledWith({
+      noteId: 2,
+      userId: 3,
+    });
+    expect(result).toEqual({ success: true, note });
   });
 });

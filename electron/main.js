@@ -6,6 +6,9 @@ import {
   registerUser,
   getAllScenarios,
   getScenarioById,
+  addSessionNote,
+  getSessionNotes,
+  deleteSessionNote,
 } from "./database/dataModels.js";
 import {
   startSession,
@@ -14,6 +17,7 @@ import {
   pauseSession,
   resumeSession,
   endSession,
+  getSession,
 } from "./database/simulation.js";
 import { seedExampleScenarios } from "./database/exampleScenarios.js";
 
@@ -150,6 +154,58 @@ ipcMain.handle("end-sim", async (event, payload) => {
     return { success: true, state };
   } catch (error) {
     console.error("Error ending simulation:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Documentation handlers
+ipcMain.handle("add-note", async (event, payload) => {
+  try {
+    const { sessionId, userId, content, vitalsSnapshot } = payload ?? {};
+    if (!sessionId || !userId || !content?.trim()) {
+      throw new Error("sessionId, userId, and content are required");
+    }
+    const session = getSession(sessionId);
+    if (!session) {
+      throw new Error("Session not found");
+    }
+    const note = addSessionNote({
+      sessionId,
+      userId,
+      content,
+      vitalsSnapshot: vitalsSnapshot ?? null,
+    });
+    return { success: true, note };
+  } catch (error) {
+    console.error("Error adding note:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("get-notes", async (event, payload) => {
+  try {
+    const { sessionId } = payload ?? {};
+    if (!sessionId) {
+      throw new Error("sessionId is required");
+    }
+    const notes = getSessionNotes(sessionId);
+    return { success: true, notes };
+  } catch (error) {
+    console.error("Error fetching notes:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("delete-note", async (event, payload) => {
+  try {
+    const { noteId, userId } = payload ?? {};
+    if (!noteId) {
+      throw new Error("noteId is required");
+    }
+    const note = deleteSessionNote({ noteId, userId });
+    return { success: true, note };
+  } catch (error) {
+    console.error("Error deleting note:", error);
     return { success: false, error: error.message };
   }
 });

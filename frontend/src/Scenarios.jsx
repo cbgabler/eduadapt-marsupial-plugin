@@ -15,6 +15,11 @@ function Scenarios() {
   const [isStarting, setIsStarting] = useState(false);
   const pollingRef = useRef(null);
   const [doseInputs, setDoseInputs] = useState({});
+  const [notes, setNotes] = useState([]);
+  const [noteContent, setNoteContent] = useState("");
+  const [noteSubmitting, setNoteSubmitting] = useState(false);
+  const [noteError, setNoteError] = useState(null);
+  const [noteDeletingId, setNoteDeletingId] = useState(null);
 
   const electronApiAvailable =
     typeof window !== "undefined" && window.api && window.api.getAllScenarios;
@@ -57,6 +62,14 @@ function Scenarios() {
     }
   }, [activeSession?.state?.status]);
 
+  useEffect(() => {
+    if (activeSession?.sessionId) {
+      loadNotes(activeSession.sessionId);
+    } else {
+      setNotes([]);
+    }
+  }, [activeSession?.sessionId]);
+
   async function loadScenarios() {
     if (!electronApiAvailable) {
       setError("Electron IPC bridge unavailable. Please run via Electron.");
@@ -93,6 +106,15 @@ function Scenarios() {
     }, POLL_INTERVAL_MS);
   }
 
+  function formatNoteTimestamp(timestamp) {
+    if (!timestamp) return "";
+    try {
+      return new Date(timestamp).toLocaleString();
+    } catch {
+      return timestamp;
+    }
+  }
+
   async function refreshSessionState(sessionId) {
     if (!window.api?.getSimulationState) return;
     try {
@@ -113,6 +135,22 @@ function Scenarios() {
     } catch (err) {
       setSessionError(err.message || "Failed to read simulation state");
       stopPolling();
+    }
+  }
+
+  async function loadNotes(sessionId) {
+    if (!window.api?.getNotes || !sessionId) {
+      return;
+    }
+    try {
+      const response = await window.api.getNotes(sessionId);
+      if (response.success) {
+        setNotes(response.notes ?? []);
+      } else {
+        setNoteError(response.error || "Unable to fetch notes");
+      }
+    } catch (err) {
+      setNoteError(err.message || "Unable to fetch notes");
     }
   }
 
@@ -144,6 +182,7 @@ function Scenarios() {
           userId: parsedUserId,
         });
         startPolling(response.sessionId);
+        await loadNotes(response.sessionId);
       } else {
         setSessionError(response.error || "Unable to start simulation");
       }
@@ -151,6 +190,62 @@ function Scenarios() {
       setSessionError(err.message || "Unable to start simulation");
     } finally {
       setIsStarting(false);
+    }
+  }
+
+  async function handleAddNote(event) {
+    event?.preventDefault?.();
+    if (!activeSession || !noteContent.trim()) {
+      setNoteError("Enter a note before saving.");
+      return;
+    }
+    if (!window.api?.addNote) {
+      setNoteError("Notes API unavailable.");
+      return;
+    }
+    setNoteSubmitting(true);
+    setNoteError(null);
+    try {
+      const response = await window.api.addNote({
+        sessionId: activeSession.sessionId,
+        userId: activeSession.userId,
+        content: noteContent,
+        vitalsSnapshot: activeSession.state.currentVitals,
+      });
+      if (response.success) {
+        setNotes((prev) => [...prev, response.note]);
+        setNoteContent("");
+      } else {
+        setNoteError(response.error || "Unable to save note");
+      }
+    } catch (err) {
+      setNoteError(err.message || "Unable to save note");
+    } finally {
+      setNoteSubmitting(false);
+    }
+  }
+
+  async function handleDeleteNote(noteId) {
+    if (!window.api?.deleteNote) {
+      setNoteError("Notes API unavailable.");
+      return;
+    }
+    setNoteDeletingId(noteId);
+    setNoteError(null);
+    try {
+      const response = await window.api.deleteNote({
+        noteId,
+        userId: activeSession?.userId,
+      });
+      if (response.success) {
+        setNotes((prev) => prev.filter((note) => note.id !== noteId));
+      } else {
+        setNoteError(response.error || "Unable to delete note");
+      }
+    } catch (err) {
+      setNoteError(err.message || "Unable to delete note");
+    } finally {
+      setNoteDeletingId(null);
     }
   }
 
@@ -473,6 +568,55 @@ function Scenarios() {
               })}
             </div>
           )}
+
+          <div className="notes-panel">
+            <h3>Simulation Notes</h3>
+            <form className="note-form" onSubmit={handleAddNote}>
+              <textarea
+                value={noteContent}
+                onChange={(event) => setNoteContent(event.target.value)}
+                placeholder="Document care, observations, or next steps…"
+                rows={3}
+              />
+              <button
+                type="submit"
+                disabled={noteSubmitting || !noteContent.trim()}
+              >
+                {noteSubmitting ? "Saving…" : "Add Note"}
+              </button>
+            </form>
+            {noteError && (
+              <div className="error-banner">
+                <p>{noteError}</p>
+              </div>
+            )}
+            <div className="notes-list">
+              {notes.length === 0 ? (
+                <p className="notes-empty">No notes recorded yet.</p>
+              ) : (
+                notes.map((note) => (
+                  <div key={note.id} className="note-item">
+                    <div className="note-meta">
+                      <span>Session #{note.sessionId}</span>
+                      <span>{formatNoteTimestamp(note.createdAt)}</span>
+                    </div>
+                    <p>{note.content}</p>
+                    {activeSession?.userId === note.userId && (
+                      <div className="note-actions">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteNote(note.id)}
+                          disabled={noteDeletingId === note.id}
+                        >
+                          {noteDeletingId === note.id ? "Deleting…" : "Delete"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
 
           <div className="simulation-controls">
             <button className="pause" onClick={handlePause}>

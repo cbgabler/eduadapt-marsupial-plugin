@@ -84,6 +84,35 @@ contextBridge.exposeInMainWorld("api", {
       return { success: false, error: error.message };
     }
   },
+  addNote: async ({ sessionId, userId, content, vitalsSnapshot }) => {
+    try {
+      return await ipcRenderer.invoke("add-note", {
+        sessionId,
+        userId,
+        content,
+        vitalsSnapshot,
+      });
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { success: false, error: error.message };
+    }
+  },
+  getNotes: async (sessionId) => {
+    try {
+      return await ipcRenderer.invoke("get-notes", { sessionId });
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { success: false, error: error.message };
+    }
+  },
+  deleteNote: async ({ noteId, userId }) => {
+    try {
+      return await ipcRenderer.invoke("delete-note", { noteId, userId });
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { success: false, error: error.message };
+    }
+  },
 });
 
 console.log("API exposed to window.api");

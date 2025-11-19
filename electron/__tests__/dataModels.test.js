@@ -19,6 +19,9 @@ const {
   getAllScenarios,
   updateScenario,
   deleteScenario,
+  addSessionNote,
+  getSessionNotes,
+  deleteSessionNote,
 } = await import("../database/dataModels.js");
 
 beforeEach(() => {
@@ -132,5 +135,118 @@ describe("scenario data model helpers", () => {
     runResults.push({ changes: 0 });
 
     expect(deleteScenario(10)).toBe(false);
+  });
+});
+
+describe("session notes helpers", () => {
+  test("addSessionNote stores sanitized content and returns payload", () => {
+    const mockNow = "2024-01-01T00:00:00.000Z";
+    runResults.push({ lastInsertRowid: 42 });
+    const dateSpy = jest.spyOn(global, "Date").mockImplementation(
+      () =>
+        ({
+          toISOString: () => mockNow,
+        })
+    );
+
+    const note = addSessionNote({
+      sessionId: 9,
+      userId: 3,
+      content: "  important update ",
+      vitalsSnapshot: { heartRate: 88 },
+    });
+
+    const statement = preparedStatements[0];
+    expect(statement.sql).toContain("INSERT INTO notes");
+    expect(statement.run).toHaveBeenCalledWith(
+      9,
+      3,
+      "important update",
+      JSON.stringify({ heartRate: 88 }),
+      mockNow
+    );
+    expect(note).toEqual({
+      id: 42,
+      sessionId: 9,
+      userId: 3,
+      content: "important update",
+      createdAt: mockNow,
+      vitalsSnapshot: { heartRate: 88 },
+    });
+
+    dateSpy.mockRestore();
+  });
+
+  test("getSessionNotes parses vitals snapshot JSON", () => {
+    allResults.push([
+      {
+        id: 1,
+        sessionId: 9,
+        userId: 3,
+        content: "note one",
+        vitalsSnapshot: JSON.stringify({ heartRate: 90 }),
+        createdAt: "2024-01-01T00:00:00Z",
+      },
+      {
+        id: 2,
+        sessionId: 9,
+        userId: 4,
+        content: "note two",
+        vitalsSnapshot: null,
+        createdAt: "2024-01-01T00:05:00Z",
+      },
+    ]);
+
+    const notes = getSessionNotes(9);
+
+    const statement = preparedStatements[0];
+    expect(statement.sql).toContain("FROM notes");
+    expect(statement.all).toHaveBeenCalledWith(9);
+    expect(notes).toEqual([
+      {
+        id: 1,
+        sessionId: 9,
+        userId: 3,
+        content: "note one",
+        createdAt: "2024-01-01T00:00:00Z",
+        vitalsSnapshot: { heartRate: 90 },
+      },
+      {
+        id: 2,
+        sessionId: 9,
+        userId: 4,
+        content: "note two",
+        createdAt: "2024-01-01T00:05:00Z",
+        vitalsSnapshot: null,
+      },
+    ]);
+  });
+
+  test("deleteSessionNote removes note and enforces ownership", () => {
+    const noteRow = {
+      id: 5,
+      sessionId: 9,
+      userId: 3,
+      content: "note",
+      vitalsSnapshot: JSON.stringify({ heartRate: 80 }),
+      createdAt: "2024-01-01T00:00:00Z",
+    };
+    getResults.push(noteRow);
+    runResults.push({ changes: 1 });
+
+    const deleted = deleteSessionNote({ noteId: 5, userId: 3 });
+
+    expect(deleted).toEqual({
+      ...noteRow,
+      vitalsSnapshot: { heartRate: 80 },
+    });
+    expect(preparedStatements[0].sql).toContain("SELECT * FROM notes");
+    expect(preparedStatements[1].sql).toContain("DELETE FROM notes");
+
+    // Now test forbidden deletion
+    getResults.push(noteRow);
+    expect(() =>
+      deleteSessionNote({ noteId: 5, userId: 10 })
+    ).toThrow("You do not have permission");
   });
 });
