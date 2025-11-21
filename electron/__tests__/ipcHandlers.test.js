@@ -34,6 +34,10 @@ async function loadMainWithScenarioMocks() {
     app: mockApp,
     BrowserWindow: mockBrowserWindow,
     ipcMain: { handle: mockIpcHandle },
+    dialog: {
+      showOpenDialog: jest.fn(),
+      showSaveDialog: jest.fn(),
+    },
   }));
 
   await jest.unstable_mockModule("../database/database.js", () => ({
@@ -41,7 +45,10 @@ async function loadMainWithScenarioMocks() {
     getDb: jest.fn(),
   }));
 
-  await jest.unstable_mockModule("../database/dataModels.js", () => dataModelMocks);
+  await jest.unstable_mockModule(
+    "../database/dataModels.js",
+    () => dataModelMocks
+  );
 
   await jest.unstable_mockModule("../database/exampleScenarios.js", () => ({
     seedExampleScenarios: jest.fn(),
@@ -56,7 +63,18 @@ async function loadMainWithScenarioMocks() {
     getSession: jest.fn(),
   };
 
-  await jest.unstable_mockModule("../database/simulation.js", () => simulationMocks);
+  await jest.unstable_mockModule(
+    "../database/simulation.js",
+    () => simulationMocks
+  );
+
+  await jest.unstable_mockModule("../database/progess/import.js", () => ({
+    importData: jest.fn(),
+  }));
+
+  await jest.unstable_mockModule("../database/progess/export.js", () => ({
+    exportData: jest.fn(),
+  }));
 
   const electron = await import("electron");
   await import("../main.js");
@@ -74,8 +92,7 @@ const findHandler = (ipcMock, channel) => {
 
 describe("scenario IPC handlers", () => {
   test("get-all-scenarios returns payload on success", async () => {
-    const { mockIpcHandle, dataModelMocks } =
-      await loadMainWithScenarioMocks();
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
     const scenarios = [{ id: 1, name: "Example" }];
     dataModelMocks.getAllScenarios.mockReturnValueOnce(scenarios);
 
@@ -87,8 +104,7 @@ describe("scenario IPC handlers", () => {
   });
 
   test("get-all-scenarios reports errors", async () => {
-    const { mockIpcHandle, dataModelMocks } =
-      await loadMainWithScenarioMocks();
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
     const err = new Error("db down");
     dataModelMocks.getAllScenarios.mockImplementation(() => {
       throw err;
@@ -101,8 +117,7 @@ describe("scenario IPC handlers", () => {
   });
 
   test("get-scenario returns record when found", async () => {
-    const { mockIpcHandle, dataModelMocks } =
-      await loadMainWithScenarioMocks();
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
     const scenario = { id: 3, name: "Case" };
     dataModelMocks.getScenarioById.mockReturnValueOnce(scenario);
 
@@ -114,8 +129,7 @@ describe("scenario IPC handlers", () => {
   });
 
   test("get-scenario returns error when not found", async () => {
-    const { mockIpcHandle, dataModelMocks } =
-      await loadMainWithScenarioMocks();
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
     dataModelMocks.getScenarioById.mockReturnValueOnce(undefined);
 
     const handler = findHandler(mockIpcHandle, "get-scenario");
@@ -128,8 +142,7 @@ describe("scenario IPC handlers", () => {
   });
 
   test("get-scenario surfaces thrown errors", async () => {
-    const { mockIpcHandle, dataModelMocks } =
-      await loadMainWithScenarioMocks();
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
     dataModelMocks.getScenarioById.mockImplementation(() => {
       throw new Error("boom");
     });
@@ -155,7 +168,11 @@ describe("simulation IPC handlers", () => {
     const result = await handler(null, { scenarioId: 3, userId: 9 });
 
     expect(simulationMocks.startSession).toHaveBeenCalledWith(3, 9);
-    expect(result).toEqual({ success: true, sessionId: 12, state: sessionState });
+    expect(result).toEqual({
+      success: true,
+      sessionId: 12,
+      state: sessionState,
+    });
   });
 
   test("start-sim reports errors", async () => {
@@ -262,8 +279,7 @@ describe("documentation IPC handlers", () => {
   });
 
   test("get-notes returns session notes", async () => {
-    const { mockIpcHandle, dataModelMocks } =
-      await loadMainWithScenarioMocks();
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
     const notes = [{ id: 1, content: "note" }];
     dataModelMocks.getSessionNotes.mockReturnValueOnce(notes);
 
@@ -275,8 +291,7 @@ describe("documentation IPC handlers", () => {
   });
 
   test("delete-note removes note when authorized", async () => {
-    const { mockIpcHandle, dataModelMocks } =
-      await loadMainWithScenarioMocks();
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
     const note = { id: 2, content: "note" };
     dataModelMocks.deleteSessionNote.mockReturnValueOnce(note);
 
