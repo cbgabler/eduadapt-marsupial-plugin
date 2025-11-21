@@ -27,6 +27,9 @@ async function loadMainModule({ isPackaged = false } = {}) {
     registerUser: jest.fn(),
     getAllScenarios: jest.fn(),
     getScenarioById: jest.fn(),
+    addSessionNote: jest.fn(),
+    getSessionNotes: jest.fn(),
+    deleteSessionNote: jest.fn(),
   };
 
   await jest.unstable_mockModule("electron", () => ({

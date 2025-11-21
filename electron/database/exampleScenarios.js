@@ -87,6 +87,13 @@ export function getExampleHypertensionScenario() {
         indication: "Hypertension",
         lastGiven: "2024-01-15T08:15:00Z",
         nextDue: "2024-01-16T08:00:00Z",
+        titration: {
+          min: 5,
+          max: 40,
+          step: 5,
+          unit: "mg",
+          current: 10,
+        },
       },
       {
         id: "med-002",
@@ -285,6 +292,39 @@ export function getExampleHypertensionScenario() {
 
     // Simulation Parameters
     simulation: {
+      tickIntervalMs: 3000,
+      baselineDrift: {
+        bloodPressure: { systolic: 0.6, diastolic: 0.3 },
+        heartRate: 0.1,
+      },
+      medicationEffects: {
+        "med-001": {
+          referenceDose: 10,
+          perUnitChange: {
+            bloodPressure: { systolic: -0.8, diastolic: -0.4 },
+            heartRate: -0.05,
+          },
+        },
+      },
+      vitalRanges: {
+        bloodPressure: {
+          systolic: { min: 110, max: 200 },
+          diastolic: { min: 60, max: 120 },
+        },
+        heartRate: { min: 50, max: 140 },
+        respiratoryRate: { min: 10, max: 30 },
+      },
+      targets: {
+        description: "Stabilize BP under 145/90 for 3 consecutive ticks",
+        holdTicks: 3,
+        vitals: {
+          bloodPressure: {
+            systolic: { max: 145 },
+            diastolic: { max: 90 },
+          },
+          heartRate: { max: 95 },
+        },
+      },
       startTime: "2024-01-15T14:30:00Z",
       simulatedTime: "2024-01-15T14:30:00Z", // Can advance independently
       timeMultiplier: 1, // 1 = real time, 60 = 1 minute real = 1 hour simulated
@@ -393,6 +433,13 @@ export function getExampleDiabetesScenario() {
         frequency: "Once daily before breakfast",
         status: "Active",
         indication: "Type 2 Diabetes",
+        titration: {
+          min: 2.5,
+          max: 10,
+          step: 2.5,
+          unit: "mg",
+          current: 5,
+        },
       },
     ],
     orders: [
@@ -415,6 +462,33 @@ export function getExampleDiabetesScenario() {
         priority: "Routine",
       },
     ],
+    simulation: {
+      tickIntervalMs: 2000,
+      baselineDrift: {
+        bloodGlucose: -1.5,
+        heartRate: -0.1,
+      },
+      medicationEffects: {
+        "med-102": {
+          referenceDose: 5,
+          perUnitChange: {
+            bloodGlucose: -3,
+          },
+        },
+      },
+      vitalRanges: {
+        bloodGlucose: { min: 50, max: 250 },
+        heartRate: { min: 50, max: 140 },
+      },
+      targets: {
+        description: "Normalize blood glucose between 90-110 mg/dL for 2 ticks",
+        holdTicks: 2,
+        vitals: {
+          bloodGlucose: { min: 90, max: 110 },
+          heartRate: { min: 70, max: 110 },
+        },
+      },
+    },
     learningObjectives: [
       "Recognize signs and symptoms of hypoglycemia",
       "Administer emergency glucose treatment",

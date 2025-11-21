@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 
 import RegisterForm from "./RegisterForm";
 import Home from "./Home";
-//import Modules from "./Modules.jsx";
+import Scenarios from "./Scenarios";
 import "./App.css";
 
 function Navigation() {
@@ -54,6 +54,16 @@ function Navigation() {
               Register
             </Link>
           </li>
+          <li className="nav-item">
+            <Link
+              to="/scenarios"
+              className={`nav-link ${
+                location.pathname === "/scenarios" ? "active" : ""
+              }`}
+            >
+              Scenarios
+            </Link>
+          </li>
           <li className="nav-item dropdown" ref={dropdownRef}>
             <button
               className="dropdown-toggle"
@@ -96,6 +106,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/RegisterForm" element={<RegisterForm />} />
+          <Route path="/scenarios" element={<Scenarios />} />
         </Routes>
       </div>
     </BrowserRouter>
