@@ -65,16 +65,6 @@ function Navigation() {
               Register
             </Link>
           </li>
-          <li className="nav-item">
-            <Link
-              to="/scenarios"
-              className={`nav-link ${
-                location.pathname === "/scenarios" ? "active" : ""
-              }`}
-            >
-              Scenarios
-            </Link>
-          </li>
           <li className="nav-item dropdown" ref={dropdownRef}>
             <button
               className="dropdown-toggle"
