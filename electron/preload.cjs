@@ -32,15 +32,38 @@ contextBridge.exposeInMainWorld("api", {
       return { success: false, error: error.message };
     }
   },
-  // Fix
-  // importFile: () => {
-  //   try {
-  //     return ipcRenderer.invoke("");
-  //   } catch (error) {
-  //     console.error("IPC error:", error);
-  //     return { success: false, error: error.message}
-  //   }
-  // }
+  importFile: async (filePath) => {
+    try {
+      return ipcRenderer.invoke("import-file", filePath);
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { success: false, error: error.message };
+    }
+  },
+  showOpenDialog: async (options) => {
+    try {
+      return await ipcRenderer.invoke("show-open-dialog", options);
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { canceled: true, error: error.message };
+    }
+  },
+  showSaveDialog: async (options) => {
+    try {
+      return await ipcRenderer.invoke("show-save-dialog", options);
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { canceled: true, error: error.message };
+    }
+  },
+  exportData: async (filePath) => {
+    try {
+      return await ipcRenderer.invoke("export-data", filePath);
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { success: false, error: error.message };
+    }
+  },
 });
 
 console.log("API exposed to window.api");

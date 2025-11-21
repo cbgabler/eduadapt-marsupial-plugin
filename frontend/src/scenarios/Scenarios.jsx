@@ -6,6 +6,8 @@ function Scenarios() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedScenario, setSelectedScenario] = useState(null);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   useEffect(() => {
     loadScenarios();
@@ -58,6 +60,22 @@ function Scenarios() {
     setSelectedScenario(null);
   };
 
+  const openImportModal = () => {
+    setShowImportModal(true);
+  };
+
+  const closeImportModal = () => {
+    setShowImportModal(false);
+  };
+
+  const openExportModal = () => {
+    setShowExportModal(true);
+  };
+
+  const closeExportModal = () => {
+    setShowExportModal(false);
+  };
+
   if (loading) {
     return (
       <div className="page-container">
@@ -84,14 +102,10 @@ function Scenarios() {
   return (
     <div className="page-container">
       <div className="export-buttons">
-        <button onClick={window.api.export}>
-          Export
-        </button>
+        <button onClick={openExportModal}>Export</button>
       </div>
       <div className="export-buttons">
-        <button onClick={window.api.import}>
-          Import
-        </button>
+        <button onClick={openImportModal}>Import</button>
       </div>
       <div className="scenarios-header">
         <h1>Available Scenarios</h1>
@@ -192,6 +206,15 @@ function Scenarios() {
           onClose={closeScenarioDetails}
         />
       )}
+
+      {showImportModal && (
+        <ImportModal
+          onClose={closeImportModal}
+          onImportSuccess={loadScenarios}
+        />
+      )}
+
+      {showExportModal && <ExportModal onClose={closeExportModal} />}
     </div>
   );
 }
@@ -409,6 +432,333 @@ function ScenarioDetailsModal({ scenario, onClose }) {
             Close
           </button>
           <button className="modal-button secondary">Start Scenario</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ImportModal({ onClose, onImportSuccess }) {
+  const [filePath, setFilePath] = useState("");
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFileSelect = async () => {
+    try {
+      if (!window.api || !window.api.showOpenDialog) {
+        setMessage(
+          "Error: File dialog API is not available. Please run this in Electron."
+        );
+        return;
+      }
+
+      // Note: This would need to be added to preload.cjs
+      // For now, we'll use a text input as a workaround
+      const result = await window.api.showOpenDialog({
+        properties: ["openFile"],
+        filters: [
+          { name: "Database Files", extensions: ["db", "sqlite", "sqlite3"] },
+        ],
+      });
+
+      if (!result.canceled && result.filePaths && result.filePaths.length > 0) {
+        setFilePath(result.filePaths[0]);
+        setMessage("");
+      }
+    } catch (err) {
+      setMessage(`Error selecting file: ${err.message}`);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setMessage("");
+
+    try {
+      if (!window.api || !window.api.importFile) {
+        setMessage(
+          "Error: Electron API is not available. Please run this in Electron."
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      if (!filePath) {
+        setMessage("Please select a file to import.");
+        setIsLoading(false);
+        return;
+      }
+
+      const result = await window.api.importFile(filePath);
+
+      if (result.success) {
+        setMessage("Import successful! Scenarios have been imported.");
+        setTimeout(() => {
+          onImportSuccess();
+          onClose();
+        }, 1500);
+      } else {
+        setMessage(result.error || "Import failed. Please try again.");
+      }
+    } catch (err) {
+      setMessage(`Error importing file: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Import Scenarios</h2>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: "var(--ehr-spacing-lg)" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "var(--ehr-spacing-sm)",
+                  color: "var(--ehr-text-primary)",
+                }}
+              >
+                Database File Path
+              </label>
+              <div style={{ display: "flex", gap: "var(--ehr-spacing-sm)" }}>
+                <input
+                  type="text"
+                  value={filePath}
+                  onChange={(e) => setFilePath(e.target.value)}
+                  placeholder="Enter file path or click Browse..."
+                  style={{
+                    flex: 1,
+                    padding: "var(--ehr-spacing-sm)",
+                    borderRadius: "var(--ehr-radius-md)",
+                    border: "1px solid var(--ehr-border)",
+                    backgroundColor: "var(--ehr-bg-primary)",
+                    color: "var(--ehr-text-primary)",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleFileSelect}
+                  className="modal-button secondary"
+                  style={{ whiteSpace: "nowrap" }}
+                >
+                  Browse...
+                </button>
+              </div>
+              <p
+                style={{
+                  fontSize: "0.875rem",
+                  color: "var(--ehr-text-secondary)",
+                  marginTop: "var(--ehr-spacing-xs)",
+                }}
+              >
+                Select a .db, .sqlite, or .sqlite3 file to import scenarios
+                from.
+              </p>
+            </div>
+
+            {message && (
+              <div
+                style={{
+                  padding: "var(--ehr-spacing-md)",
+                  borderRadius: "var(--ehr-radius-md)",
+                  backgroundColor: message.includes("success")
+                    ? "rgba(16, 185, 129, 0.1)"
+                    : "rgba(239, 68, 68, 0.1)",
+                  color: message.includes("success")
+                    ? "var(--ehr-success)"
+                    : "var(--ehr-error)",
+                  marginBottom: "var(--ehr-spacing-md)",
+                }}
+              >
+                {message}
+              </div>
+            )}
+          </form>
+        </div>
+
+        <div className="modal-footer">
+          <button className="modal-button secondary" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="modal-button primary"
+            onClick={handleSubmit}
+            disabled={isLoading || !filePath}
+          >
+            {isLoading ? "Importing..." : "Import"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExportModal({ onClose }) {
+  const [filePath, setFilePath] = useState("");
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFileSelect = async () => {
+    try {
+      if (!window.api || !window.api.showSaveDialog) {
+        setMessage(
+          "Error: File dialog API is not available. Please run this in Electron."
+        );
+        return;
+      }
+
+      // Note: This would need to be added to preload.cjs
+      const result = await window.api.showSaveDialog({
+        filters: [
+          { name: "Database Files", extensions: ["db", "sqlite", "sqlite3"] },
+        ],
+        defaultPath: "ehr_scenarios.db",
+      });
+
+      if (!result.canceled && result.filePath) {
+        setFilePath(result.filePath);
+        setMessage("");
+      }
+    } catch (err) {
+      setMessage(`Error selecting file: ${err.message}`);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setMessage("");
+
+    try {
+      if (!window.api || !window.api.exportData) {
+        setMessage(
+          "Error: Electron API is not available. Please run this in Electron."
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      if (!filePath) {
+        setMessage("Please select a location to save the export file.");
+        setIsLoading(false);
+        return;
+      }
+
+      const result = await window.api.exportData(filePath);
+
+      if (result.success) {
+        setMessage("Export successful! Scenarios have been exported.");
+        setTimeout(() => {
+          onClose();
+        }, 1500);
+      } else {
+        setMessage(result.error || "Export failed. Please try again.");
+      }
+    } catch (err) {
+      setMessage(`Error exporting file: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Export Scenarios</h2>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: "var(--ehr-spacing-lg)" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "var(--ehr-spacing-sm)",
+                  color: "var(--ehr-text-primary)",
+                }}
+              >
+                Save Location
+              </label>
+              <div style={{ display: "flex", gap: "var(--ehr-spacing-sm)" }}>
+                <input
+                  type="text"
+                  value={filePath}
+                  onChange={(e) => setFilePath(e.target.value)}
+                  placeholder="Enter file path or click Browse..."
+                  style={{
+                    flex: 1,
+                    padding: "var(--ehr-spacing-sm)",
+                    borderRadius: "var(--ehr-radius-md)",
+                    border: "1px solid var(--ehr-border)",
+                    backgroundColor: "var(--ehr-bg-primary)",
+                    color: "var(--ehr-text-primary)",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleFileSelect}
+                  className="modal-button secondary"
+                  style={{ whiteSpace: "nowrap" }}
+                >
+                  Browse...
+                </button>
+              </div>
+              <p
+                style={{
+                  fontSize: "0.875rem",
+                  color: "var(--ehr-text-secondary)",
+                  marginTop: "var(--ehr-spacing-xs)",
+                }}
+              >
+                Choose where to save the exported scenarios database file.
+              </p>
+            </div>
+
+            {message && (
+              <div
+                style={{
+                  padding: "var(--ehr-spacing-md)",
+                  borderRadius: "var(--ehr-radius-md)",
+                  backgroundColor: message.includes("success")
+                    ? "rgba(16, 185, 129, 0.1)"
+                    : "rgba(239, 68, 68, 0.1)",
+                  color: message.includes("success")
+                    ? "var(--ehr-success)"
+                    : "var(--ehr-error)",
+                  marginBottom: "var(--ehr-spacing-md)",
+                }}
+              >
+                {message}
+              </div>
+            )}
+          </form>
+        </div>
+
+        <div className="modal-footer">
+          <button className="modal-button secondary" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="modal-button primary"
+            onClick={handleSubmit}
+            disabled={isLoading || !filePath}
+          >
+            {isLoading ? "Exporting..." : "Export"}
+          </button>
         </div>
       </div>
     </div>
