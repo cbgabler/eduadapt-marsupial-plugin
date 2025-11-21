@@ -55,6 +55,17 @@ export function initDatabase() {
       FOREIGN KEY (scenarioId) REFERENCES scenarios(id),
       FOREIGN KEY (userId) REFERENCES users(id)
     );
+
+    CREATE TABLE IF NOT EXISTS notes (
+      id INTEGER PRIMARY KEY,
+      sessionId INTEGER,
+      userId INTEGER,
+      content TEXT,
+      vitalsSnapshot TEXT,
+      createdAt DATETIME,
+      FOREIGN KEY (sessionId) REFERENCES sessions(id),
+      FOREIGN KEY (userId) REFERENCES users(id)
+    );
   `);
 
   return db;
