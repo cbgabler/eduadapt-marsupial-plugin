@@ -6,7 +6,7 @@ import fs from "fs";
 // Export current scenario from local db for sharing to students
 export function exportData(filePath) {
   const db = getDb();
-  const sourceDbPath = path.join(app.getPath("userData"), "ehr_sim.db");
+  const sourceDbPath = path.join(app.getPath("userData"), "ehr_scenarios.db");
 
   if (!fs.existsSync(sourceDbPath)) {
     throw new Error("Source database file does not exist");
