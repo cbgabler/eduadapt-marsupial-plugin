@@ -2,15 +2,27 @@ import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { initDatabase } from "./database/database.js";
+
+// Users
 import {
   authenticateUser,
-  registerUser,
+  registerUser
+} from "./database/models/users.js"
+
+// Scenarios
+import {
   getAllScenarios,
   getScenarioById,
+} from "./database/models/scenarios.js"
+
+// Sessions
+import {
   addSessionNote,
   getSessionNotes,
-  deleteSessionNote,
-} from "./database/dataModels.js";
+  deleteSessionNote
+} from "./database/models/sessions.js"
+
+// Simulation deps
 import {
   startSession,
   getSessionState,
@@ -21,6 +33,8 @@ import {
   getSession,
 } from "./database/simulation.js";
 import { seedExampleScenarios } from "./database/exampleScenarios.js";
+
+// Import & Export deps
 import { importData } from "./database/progess/import.js";
 import { exportData } from "./database/progess/export.js";
 

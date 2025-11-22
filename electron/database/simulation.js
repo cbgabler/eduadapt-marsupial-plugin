@@ -1,5 +1,5 @@
 import { getDb } from './database.js';
-import { getScenarioById } from './dataModels.js';
+import { getScenarioById } from './models/scenarios.js';
 
 const DEFAULT_TICK_INTERVAL_MS = 5000;
 const DEFAULT_VITAL_RANGES = {
