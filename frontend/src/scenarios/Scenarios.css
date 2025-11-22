@@ -415,11 +415,13 @@
 /* Modal Footer */
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
-  gap: var(--ehr-spacing-md);
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--ehr-spacing-xl);
   padding: var(--ehr-spacing-xl);
   border-top: 1px solid var(--ehr-border);
   background-color: var(--ehr-bg-secondary);
+  flex-wrap: wrap;
 }
 
 .modal-button {
@@ -506,3 +508,340 @@
     margin-top: var(--ehr-spacing-xs);
   }
 }
+
+/* Scenario Actions */
+.scenario-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ehr-spacing-sm);
+  margin-bottom: var(--ehr-spacing-xl);
+  flex-wrap: wrap;
+}
+
+.scenario-actions button {
+  border: 1px solid var(--ehr-border);
+  border-radius: var(--ehr-radius-md);
+  background-color: var(--ehr-bg-primary);
+  color: var(--ehr-text-primary);
+  padding: var(--ehr-spacing-sm) var(--ehr-spacing-lg);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.scenario-actions button:hover {
+  border-color: var(--ehr-primary);
+  color: var(--ehr-primary);
+}
+
+.scenario-actions button:first-child {
+  background-color: var(--ehr-primary);
+  color: var(--ehr-text-inverse);
+  border-color: transparent;
+}
+
+.scenario-actions button:first-child:hover {
+  background-color: var(--ehr-primary-dark);
+}
+
+/* Simulation Panel */
+.simulation-panel {
+  margin-top: var(--ehr-spacing-2xl);
+  border: 1px solid var(--ehr-border);
+  border-radius: var(--ehr-radius-xl);
+  background-color: var(--ehr-bg-secondary);
+  padding: var(--ehr-spacing-2xl);
+  box-shadow: var(--ehr-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ehr-spacing-xl);
+}
+
+.simulation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--ehr-spacing-lg);
+  flex-wrap: wrap;
+}
+
+.simulation-subtitle {
+  margin: var(--ehr-spacing-xs) 0 0;
+  color: var(--ehr-text-secondary);
+}
+
+.simulation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ehr-spacing-sm);
+}
+
+.session-pill {
+  border: 1px solid var(--ehr-border);
+  border-radius: 999px;
+  padding: var(--ehr-spacing-xs) var(--ehr-spacing-md);
+  font-size: 0.875rem;
+  color: var(--ehr-text-secondary);
+  background-color: var(--ehr-bg-primary);
+}
+
+.session-pill.session-status {
+  border-color: var(--ehr-primary);
+  color: var(--ehr-primary);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.target-banner {
+  border-radius: var(--ehr-radius-lg);
+  padding: var(--ehr-spacing-md) var(--ehr-spacing-xl);
+  background-color: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: var(--ehr-text-primary);
+}
+
+.target-banner.met {
+  background-color: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.target-progress {
+  font-size: 0.875rem;
+  margin-top: var(--ehr-spacing-xs);
+  color: var(--ehr-text-secondary);
+}
+
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--ehr-spacing-md);
+}
+
+.vital-card {
+  border: 1px solid var(--ehr-border-light);
+  border-radius: var(--ehr-radius-lg);
+  padding: var(--ehr-spacing-md);
+  background-color: var(--ehr-bg-primary);
+}
+
+.vital-card span {
+  font-size: 0.875rem;
+  color: var(--ehr-text-secondary);
+}
+
+.vital-card strong {
+  font-size: 1.25rem;
+  color: var(--ehr-text-primary);
+}
+
+.medications-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ehr-spacing-md);
+}
+
+.medication-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ehr-spacing-md);
+  padding-bottom: var(--ehr-spacing-md);
+  border-bottom: 1px solid var(--ehr-border-light);
+  justify-content: space-between;
+}
+
+.medication-meta {
+  font-size: 0.875rem;
+  color: var(--ehr-text-secondary);
+  margin: 0;
+}
+
+.medication-controls {
+  display: flex;
+  gap: var(--ehr-spacing-sm);
+  align-items: center;
+}
+
+.medication-controls input {
+  width: 120px;
+  padding: var(--ehr-spacing-xs) var(--ehr-spacing-sm);
+  border-radius: var(--ehr-radius-md);
+  border: 1px solid var(--ehr-border);
+  background-color: var(--ehr-bg-primary);
+}
+
+.medication-controls button {
+  background-color: var(--ehr-primary);
+  color: var(--ehr-text-inverse);
+  border: none;
+  border-radius: var(--ehr-radius-md);
+  padding: var(--ehr-spacing-xs) var(--ehr-spacing-lg);
+  cursor: pointer;
+}
+
+.notes-panel {
+  border-top: 1px solid var(--ehr-border-light);
+  padding-top: var(--ehr-spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ehr-spacing-md);
+}
+
+.note-form textarea {
+  width: 100%;
+  border-radius: var(--ehr-radius-lg);
+  border: 1px solid var(--ehr-border);
+  padding: var(--ehr-spacing-md);
+  background-color: var(--ehr-bg-primary);
+  color: var(--ehr-text-primary);
+  resize: vertical;
+}
+
+.note-form button {
+  align-self: flex-end;
+  background-color: var(--ehr-primary);
+  color: var(--ehr-text-inverse);
+  border: none;
+  border-radius: var(--ehr-radius-md);
+  padding: var(--ehr-spacing-sm) var(--ehr-spacing-xl);
+  cursor: pointer;
+}
+
+.notes-error {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-radius: var(--ehr-radius-md);
+  padding: var(--ehr-spacing-sm) var(--ehr-spacing-md);
+  color: var(--ehr-error);
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ehr-spacing-md);
+}
+
+.note-item {
+  border: 1px solid var(--ehr-border-light);
+  border-radius: var(--ehr-radius-lg);
+  padding: var(--ehr-spacing-md);
+  background-color: var(--ehr-bg-primary);
+  box-shadow: var(--ehr-shadow-sm);
+}
+
+.note-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--ehr-text-secondary);
+  margin-bottom: var(--ehr-spacing-xs);
+}
+
+.note-actions {
+  text-align: right;
+  margin-top: var(--ehr-spacing-sm);
+}
+
+.note-actions button {
+  border: none;
+  background-color: var(--ehr-error);
+  color: var(--ehr-text-inverse);
+  border-radius: var(--ehr-radius-md);
+  padding: var(--ehr-spacing-xs) var(--ehr-spacing-md);
+  cursor: pointer;
+}
+
+.notes-empty {
+  font-style: italic;
+  color: var(--ehr-text-secondary);
+}
+
+.simulation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ehr-spacing-sm);
+}
+
+.simulation-controls button {
+  border: none;
+  border-radius: var(--ehr-radius-md);
+  padding: var(--ehr-spacing-sm) var(--ehr-spacing-xl);
+  color: var(--ehr-text-inverse);
+  cursor: pointer;
+}
+
+.simulation-controls .pause {
+  background-color: var(--ehr-warning);
+  color: var(--ehr-text-primary);
+}
+
+.simulation-controls .resume {
+  background-color: var(--ehr-success);
+}
+
+.simulation-controls .end {
+  background-color: var(--ehr-error);
+}
+
+.completion-banner {
+  border-radius: var(--ehr-radius-lg);
+  padding: var(--ehr-spacing-md) var(--ehr-spacing-xl);
+  background-color: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: var(--ehr-text-primary);
+}
+
+.simulation-error {
+  color: var(--ehr-error);
+  font-weight: 500;
+}
+
+.start-scenario-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ehr-spacing-xs);
+}
+
+.start-scenario-controls input {
+  border-radius: var(--ehr-radius-md);
+  border: 1px solid var(--ehr-border);
+  padding: var(--ehr-spacing-xs) var(--ehr-spacing-sm);
+  background-color: var(--ehr-bg-primary);
+}
+
+.start-scenario-hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ehr-text-secondary);
+}
+
+.start-error {
+  color: var(--ehr-error);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--ehr-spacing-sm);
+  justify-content: flex-end;
+}
+
+.notes-panel h3,
+.medications-panel h3 {
+  margin: 0;
+  color: var(--ehr-text-primary);
+}
+
+
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ehr-spacing-sm);
+}
+
+.note-actions button:disabled,
+.medication-controls button:disabled,
+.note-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
