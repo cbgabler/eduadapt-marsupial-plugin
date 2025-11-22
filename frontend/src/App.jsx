@@ -5,7 +5,7 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
-import Navigation from "./pages/combined/Navigation.jsx";
+import Navigation from ".pages/Combined/Navigation.jsx";
 import SignInPage from "./pages/Auth/SignInPage.jsx";
 import HomePage from "./pages/Home/HomePage.jsx";
 import { useAuth } from "./pages/Auth/AuthContext.jsx";
