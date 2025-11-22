@@ -21,11 +21,17 @@ async function loadMainWithScenarioMocks() {
     get: () => false,
   });
 
-  const dataModelMocks = {
+  const userMocks = {
     registerUser: jest.fn(),
     authenticateUser: jest.fn(),
+  };
+
+  const scenarioMocks = {
     getAllScenarios: jest.fn(),
     getScenarioById: jest.fn(),
+  };
+
+  const sessionMocks = {
     addSessionNote: jest.fn(),
     getSessionNotes: jest.fn(),
     deleteSessionNote: jest.fn(),
@@ -47,8 +53,18 @@ async function loadMainWithScenarioMocks() {
   }));
 
   await jest.unstable_mockModule(
-    "../database/dataModels.js",
-    () => dataModelMocks
+    "../database/models/users.js",
+    () => userMocks
+  );
+
+  await jest.unstable_mockModule(
+    "../database/models/scenarios.js",
+    () => scenarioMocks
+  );
+
+  await jest.unstable_mockModule(
+    "../database/models/sessions.js",
+    () => sessionMocks
   );
 
   await jest.unstable_mockModule("../database/exampleScenarios.js", () => ({
@@ -80,7 +96,14 @@ async function loadMainWithScenarioMocks() {
   const electron = await import("electron");
   await import("../main.js");
 
-  return { electron, dataModelMocks, mockIpcHandle, simulationMocks };
+  return {
+    electron,
+    userMocks,
+    scenarioMocks,
+    sessionMocks,
+    mockIpcHandle,
+    simulationMocks,
+  };
 }
 
 const findHandler = (ipcMock, channel) => {
@@ -93,21 +116,21 @@ const findHandler = (ipcMock, channel) => {
 
 describe("scenario IPC handlers", () => {
   test("get-all-scenarios returns payload on success", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    const { mockIpcHandle, scenarioMocks } = await loadMainWithScenarioMocks();
     const scenarios = [{ id: 1, name: "Example" }];
-    dataModelMocks.getAllScenarios.mockReturnValueOnce(scenarios);
+    scenarioMocks.getAllScenarios.mockReturnValueOnce(scenarios);
 
     const handler = findHandler(mockIpcHandle, "get-all-scenarios");
     const response = await handler();
 
-    expect(dataModelMocks.getAllScenarios).toHaveBeenCalledTimes(1);
+    expect(scenarioMocks.getAllScenarios).toHaveBeenCalledTimes(1);
     expect(response).toEqual({ success: true, scenarios });
   });
 
   test("get-all-scenarios reports errors", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    const { mockIpcHandle, scenarioMocks } = await loadMainWithScenarioMocks();
     const err = new Error("db down");
-    dataModelMocks.getAllScenarios.mockImplementation(() => {
+    scenarioMocks.getAllScenarios.mockImplementation(() => {
       throw err;
     });
 
@@ -118,20 +141,20 @@ describe("scenario IPC handlers", () => {
   });
 
   test("get-scenario returns record when found", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    const { mockIpcHandle, scenarioMocks } = await loadMainWithScenarioMocks();
     const scenario = { id: 3, name: "Case" };
-    dataModelMocks.getScenarioById.mockReturnValueOnce(scenario);
+    scenarioMocks.getScenarioById.mockReturnValueOnce(scenario);
 
     const handler = findHandler(mockIpcHandle, "get-scenario");
     const response = await handler(null, 3);
 
-    expect(dataModelMocks.getScenarioById).toHaveBeenCalledWith(3);
+    expect(scenarioMocks.getScenarioById).toHaveBeenCalledWith(3);
     expect(response).toEqual({ success: true, scenario });
   });
 
   test("get-scenario returns error when not found", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
-    dataModelMocks.getScenarioById.mockReturnValueOnce(undefined);
+    const { mockIpcHandle, scenarioMocks } = await loadMainWithScenarioMocks();
+    scenarioMocks.getScenarioById.mockReturnValueOnce(undefined);
 
     const handler = findHandler(mockIpcHandle, "get-scenario");
     const response = await handler(null, 7);
@@ -143,8 +166,8 @@ describe("scenario IPC handlers", () => {
   });
 
   test("get-scenario surfaces thrown errors", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
-    dataModelMocks.getScenarioById.mockImplementation(() => {
+    const { mockIpcHandle, scenarioMocks } = await loadMainWithScenarioMocks();
+    scenarioMocks.getScenarioById.mockImplementation(() => {
       throw new Error("boom");
     });
 
@@ -157,21 +180,25 @@ describe("scenario IPC handlers", () => {
 
 describe("auth IPC handlers", () => {
   test("register-user returns new user on success", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    const { mockIpcHandle, userMocks } = await loadMainWithScenarioMocks();
     const mockUser = { id: 4, username: "nurse", role: "student" };
-    dataModelMocks.registerUser.mockReturnValueOnce(mockUser);
+    userMocks.registerUser.mockReturnValueOnce(mockUser);
 
     const handler = findHandler(mockIpcHandle, "register-user");
-    const payload = { username: "nurse", password: "Secret1!", role: "student" };
+    const payload = {
+      username: "nurse",
+      password: "Secret1!",
+      role: "student",
+    };
     const response = await handler(null, payload);
 
-    expect(dataModelMocks.registerUser).toHaveBeenCalledWith(payload);
+    expect(userMocks.registerUser).toHaveBeenCalledWith(payload);
     expect(response).toEqual({ success: true, user: mockUser });
   });
 
   test("register-user reports underlying errors", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
-    dataModelMocks.registerUser.mockImplementation(() => {
+    const { mockIpcHandle, userMocks } = await loadMainWithScenarioMocks();
+    userMocks.registerUser.mockImplementation(() => {
       throw new Error("taken");
     });
 
@@ -182,9 +209,9 @@ describe("auth IPC handlers", () => {
   });
 
   test("login-user returns authenticated user", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    const { mockIpcHandle, userMocks } = await loadMainWithScenarioMocks();
     const mockUser = { id: 2, username: "educator", role: "instructor" };
-    dataModelMocks.authenticateUser.mockReturnValueOnce(mockUser);
+    userMocks.authenticateUser.mockReturnValueOnce(mockUser);
 
     const handler = findHandler(mockIpcHandle, "login-user");
     const response = await handler(null, {
@@ -192,7 +219,7 @@ describe("auth IPC handlers", () => {
       password: "StrongPass1!",
     });
 
-    expect(dataModelMocks.authenticateUser).toHaveBeenCalledWith(
+    expect(userMocks.authenticateUser).toHaveBeenCalledWith(
       "educator",
       "StrongPass1!"
     );
@@ -200,8 +227,8 @@ describe("auth IPC handlers", () => {
   });
 
   test("login-user surfaces authentication failures", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
-    dataModelMocks.authenticateUser.mockImplementation(() => {
+    const { mockIpcHandle, userMocks } = await loadMainWithScenarioMocks();
+    userMocks.authenticateUser.mockImplementation(() => {
       throw new Error("Invalid credentials");
     });
 
