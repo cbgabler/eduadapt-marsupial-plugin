@@ -20,6 +20,13 @@
   display: flex;
   align-items: center;
   min-height: 64px;
+  gap: var(--ehr-spacing-xl);
+}
+
+.app-navigation .nav-brand {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--ehr-text-primary);
 }
 
 .app-navigation .nav {
@@ -33,6 +40,10 @@
 .app-navigation .nav-item {
   display: flex;
   align-items: center;
+}
+
+.app-navigation .nav-auth {
+  margin-left: auto;
 }
 
 .app-navigation .nav-link {
@@ -57,12 +68,7 @@
   background-color: rgba(37, 99, 235, 0.1);
 }
 
-/* Dropdown Styles */
-.app-navigation .dropdown {
-  position: relative;
-}
-
-.app-navigation .dropdown-toggle {
+.app-navigation .nav-button {
   background: none;
   border: none;
   color: var(--ehr-text-secondary);
@@ -76,37 +82,11 @@
   align-items: center;
 }
 
-.app-navigation .dropdown-toggle:hover {
+.app-navigation .nav-button:hover:not(:disabled) {
   background-color: var(--ehr-bg-tertiary);
   color: var(--ehr-primary);
-}
-
-.app-navigation .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: var(--ehr-bg-primary);
-  border: 1px solid var(--ehr-border);
-  border-radius: var(--ehr-radius-md);
-  box-shadow: var(--ehr-shadow-lg);
-  min-width: 150px;
-  margin-top: var(--ehr-spacing-xs);
-  z-index: 1000;
-  padding: var(--ehr-spacing-xs) 0;
-}
-
-.app-navigation .dropdown-item {
-  display: block;
-  padding: var(--ehr-spacing-sm) var(--ehr-spacing-md);
-  color: var(--ehr-text-primary);
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.app-navigation .dropdown-item:hover {
-  background-color: var(--ehr-bg-tertiary);
-  color: var(--ehr-primary);
-  text-decoration: none;
+  box-shadow: none;
+  transform: none;
 }
 
 /* Main Content Area */
@@ -132,12 +112,17 @@
 @media (max-width: 768px) {
   .app-navigation nav {
     flex-wrap: wrap;
+    gap: var(--ehr-spacing-md);
   }
 
   .app-navigation .nav {
     flex-direction: column;
     align-items: stretch;
     gap: var(--ehr-spacing-sm);
+  }
+
+  .app-navigation .nav-auth {
+    margin-left: 0;
   }
 
   .app-content {

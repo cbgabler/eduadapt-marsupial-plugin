@@ -1,101 +1,30 @@
-import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
-
-import RegisterForm from "./RegisterForm";
-import Home from "./Home";
-import Scenarios from "./scenarios/Scenarios";
-//import Modules from "./Modules.jsx";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
+import Navigation from "./pages/combined/Navigation.jsx";
+import SignInPage from "./pages/Auth/SignInPage.jsx";
+import HomePage from "./pages/Home/HomePage.jsx";
+import { useAuth } from "./pages/Auth/AuthContext.jsx";
 import "./App.css";
 
-function Navigation() {
+function ProtectedRoute({ children }) {
   const location = useLocation();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const { isAuthenticated } = useAuth();
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    }
+  if (!isAuthenticated) {
+    return <Navigate to="/sign-in" replace state={{ from: location }} />;
+  }
 
-    if (dropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+  return children;
+}
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownOpen]);
-
-  return (
-    <div className="app-navigation">
-      <nav>
-        <ul className="nav">
-          <li className="nav-item">
-            <Link
-              to="/home"
-              className={`nav-link ${
-                location.pathname === "/home" || location.pathname === "/"
-                  ? "active"
-                  : ""
-              }`}
-            >
-              Home
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link
-              to="/Scenarios"
-              className={`nav-link ${
-                location.pathname === "/Scenarios" ? "active" : ""
-              }`}
-            >
-              Scenarios
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link
-              to="/RegisterForm"
-              className={`nav-link ${
-                location.pathname === "/RegisterForm" ? "active" : ""
-              }`}
-            >
-              Register
-            </Link>
-          </li>
-          <li className="nav-item dropdown" ref={dropdownRef}>
-            <button
-              className="dropdown-toggle"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              aria-expanded={dropdownOpen}
-            >
-              SignIn
-            </button>
-            {dropdownOpen && (
-              <div className="dropdown-menu">
-                <Link
-                  to="/SignIn"
-                  className="dropdown-item"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  SignIn
-                </Link>
-                <Link
-                  to="/SignUp"
-                  className="dropdown-item"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  SignUp
-                </Link>
-              </div>
-            )}
-          </li>
-        </ul>
-      </nav>
-    </div>
-  );
+function LandingRoute() {
+  const { isAuthenticated } = useAuth();
+  return <Navigate to={isAuthenticated ? "/home" : "/sign-in"} replace />;
 }
 
 function App() {
@@ -104,10 +33,17 @@ function App() {
       <Navigation />
       <div className="app-content">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/RegisterForm" element={<RegisterForm />} />
-          <Route path="/Scenarios" element={<Scenarios />} />
+          <Route path="/" element={<LandingRoute />} />
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </BrowserRouter>
