@@ -6,11 +6,20 @@ console.log("Preload script loaded");
 contextBridge.exposeInMainWorld("api", {
   message: () => "test",
   registerUser: async (userData) => {
-    console.log("registerUser called with:", userData);
+    // commented out bc it contains password
+    //console.log("registerUser called with:", userData);
     try {
       const result = await ipcRenderer.invoke("register-user", userData);
       console.log("IPC result:", result);
       return result;
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { success: false, error: error.message };
+    }
+  },
+  loginUser: async (credentials) => {
+    try {
+      return await ipcRenderer.invoke("login-user", credentials);
     } catch (error) {
       console.error("IPC error:", error);
       return { success: false, error: error.message };
