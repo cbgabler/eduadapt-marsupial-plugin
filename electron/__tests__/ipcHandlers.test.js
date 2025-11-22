@@ -349,11 +349,11 @@ describe("simulation IPC handlers", () => {
 
 describe("documentation IPC handlers", () => {
   test("add-note stores note via data model", async () => {
-    const { mockIpcHandle, dataModelMocks, simulationMocks } =
+    const { mockIpcHandle, sessionMocks, simulationMocks } =
       await loadMainWithScenarioMocks();
     simulationMocks.getSession.mockReturnValueOnce({ id: 7 });
     const savedNote = { id: 1, content: "note" };
-    dataModelMocks.addSessionNote.mockReturnValueOnce(savedNote);
+    sessionMocks.addSessionNote.mockReturnValueOnce(savedNote);
 
     const handler = findHandler(mockIpcHandle, "add-note");
     const payload = {
@@ -365,31 +365,31 @@ describe("documentation IPC handlers", () => {
     const result = await handler(null, payload);
 
     expect(simulationMocks.getSession).toHaveBeenCalledWith(5);
-    expect(dataModelMocks.addSessionNote).toHaveBeenCalledWith(payload);
+    expect(sessionMocks.addSessionNote).toHaveBeenCalledWith(payload);
     expect(result).toEqual({ success: true, note: savedNote });
   });
 
   test("get-notes returns session notes", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    const { mockIpcHandle, sessionMocks } = await loadMainWithScenarioMocks();
     const notes = [{ id: 1, content: "note" }];
-    dataModelMocks.getSessionNotes.mockReturnValueOnce(notes);
+    sessionMocks.getSessionNotes.mockReturnValueOnce(notes);
 
     const handler = findHandler(mockIpcHandle, "get-notes");
     const result = await handler(null, { sessionId: 3 });
 
-    expect(dataModelMocks.getSessionNotes).toHaveBeenCalledWith(3);
+    expect(sessionMocks.getSessionNotes).toHaveBeenCalledWith(3);
     expect(result).toEqual({ success: true, notes });
   });
 
   test("delete-note removes note when authorized", async () => {
-    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    const { mockIpcHandle, sessionMocks } = await loadMainWithScenarioMocks();
     const note = { id: 2, content: "note" };
-    dataModelMocks.deleteSessionNote.mockReturnValueOnce(note);
+    sessionMocks.deleteSessionNote.mockReturnValueOnce(note);
 
     const handler = findHandler(mockIpcHandle, "delete-note");
     const result = await handler(null, { noteId: 2, userId: 3 });
 
-    expect(dataModelMocks.deleteSessionNote).toHaveBeenCalledWith({
+    expect(sessionMocks.deleteSessionNote).toHaveBeenCalledWith({
       noteId: 2,
       userId: 3,
     });
