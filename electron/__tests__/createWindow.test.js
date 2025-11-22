@@ -38,6 +38,10 @@ async function loadMainModule({ isPackaged = false } = {}) {
     ipcMain: {
       handle: mockIpcHandle,
     },
+    dialog: {
+      showOpenDialog: jest.fn(),
+      showSaveDialog: jest.fn(),
+    },
   }));
 
   await jest.unstable_mockModule("../database/database.js", () => ({
@@ -45,10 +49,31 @@ async function loadMainModule({ isPackaged = false } = {}) {
     getDb: jest.fn(),
   }));
 
-  await jest.unstable_mockModule("../database/dataModels.js", () => mockDataModels);
+  await jest.unstable_mockModule(
+    "../database/dataModels.js",
+    () => mockDataModels
+  );
 
   await jest.unstable_mockModule("../database/exampleScenarios.js", () => ({
     seedExampleScenarios: jest.fn(),
+  }));
+
+  await jest.unstable_mockModule("../database/progess/import.js", () => ({
+    importData: jest.fn(),
+  }));
+
+  await jest.unstable_mockModule("../database/progess/export.js", () => ({
+    exportData: jest.fn(),
+  }));
+
+  await jest.unstable_mockModule("../database/simulation.js", () => ({
+    startSession: jest.fn(),
+    getSessionState: jest.fn(),
+    adjustMedication: jest.fn(),
+    pauseSession: jest.fn(),
+    resumeSession: jest.fn(),
+    endSession: jest.fn(),
+    getSession: jest.fn(),
   }));
 
   const electron = await import("electron");

@@ -3,7 +3,8 @@ import { useState, useEffect, useRef } from "react";
 
 import RegisterForm from "./RegisterForm";
 import Home from "./Home";
-import Scenarios from "./Scenarios";
+import Scenarios from "./scenarios/Scenarios";
+//import Modules from "./Modules.jsx";
 import "./App.css";
 
 function Navigation() {
@@ -46,22 +47,22 @@ function Navigation() {
           </li>
           <li className="nav-item">
             <Link
+              to="/Scenarios"
+              className={`nav-link ${
+                location.pathname === "/Scenarios" ? "active" : ""
+              }`}
+            >
+              Scenarios
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link
               to="/RegisterForm"
               className={`nav-link ${
                 location.pathname === "/RegisterForm" ? "active" : ""
               }`}
             >
               Register
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link
-              to="/scenarios"
-              className={`nav-link ${
-                location.pathname === "/scenarios" ? "active" : ""
-              }`}
-            >
-              Scenarios
             </Link>
           </li>
           <li className="nav-item dropdown" ref={dropdownRef}>
@@ -106,7 +107,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/RegisterForm" element={<RegisterForm />} />
-          <Route path="/scenarios" element={<Scenarios />} />
+          <Route path="/Scenarios" element={<Scenarios />} />
         </Routes>
       </div>
     </BrowserRouter>

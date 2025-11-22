@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { initDatabase } from "./database/database.js";
@@ -20,6 +20,8 @@ import {
   getSession,
 } from "./database/simulation.js";
 import { seedExampleScenarios } from "./database/exampleScenarios.js";
+import { importData } from "./database/progess/import.js";
+import { exportData } from "./database/progess/export.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -206,6 +208,50 @@ ipcMain.handle("delete-note", async (event, payload) => {
     return { success: true, note };
   } catch (error) {
     console.error("Error deleting note:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Import & Export handlers
+ipcMain.handle("show-open-dialog", async (event, options) => {
+  try {
+    const result = await dialog.showOpenDialog(options);
+    return result;
+  } catch (error) {
+    console.error("Error showing open dialog:", error);
+    return { canceled: true, error: error.message };
+  }
+});
+
+ipcMain.handle("show-save-dialog", async (event, options) => {
+  try {
+    const result = await dialog.showSaveDialog(options);
+    return result;
+  } catch (error) {
+    console.error("Error showing save dialog:", error);
+    return { canceled: true, error: error.message };
+  }
+});
+
+ipcMain.handle("import-file", async (event, filePath) => {
+  try {
+    const importFilePath = importData(filePath);
+    if (!importFilePath) {
+      return { success: false, error: "Importing failed" };
+    }
+    return { success: true, filePath };
+  } catch (error) {
+    console.error("Error importing file:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("export-data", async (event, filePath) => {
+  try {
+    const result = exportData(filePath);
+    return result;
+  } catch (error) {
+    console.error("Error exporting data:", error);
     return { success: false, error: error.message };
   }
 });

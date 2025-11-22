@@ -7,7 +7,7 @@ let db;
 
 // Initializes the current database if it doesn't already exist
 export function initDatabase() {
-  const dbPath = path.join(app.getPath("userData"), "ehr_sim.db");
+  const dbPath = path.join(app.getPath("userData"), "ehr_scenarios.db");
   db = new Database(dbPath);
 
   // Build table if not exists
