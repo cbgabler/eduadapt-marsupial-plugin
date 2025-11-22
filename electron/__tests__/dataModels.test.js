@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals";
+import { scryptSync } from "crypto";
 
 const mockPrepare = jest.fn();
 const mockDb = { prepare: mockPrepare };
@@ -14,6 +15,8 @@ await jest.unstable_mockModule("../database/database.js", () => ({
 }));
 
 const {
+  registerUser,
+  authenticateUser,
   createScenario,
   getScenarioById,
   getAllScenarios,
@@ -46,6 +49,77 @@ beforeEach(() => {
     };
     preparedStatements.push(statement);
     return statement;
+  });
+});
+
+describe("auth helpers", () => {
+  test("registerUser inserts sanitized user record", () => {
+    getResults.push(undefined);
+    getResults.push({
+      id: 5,
+      username: "nurse",
+      role: "instructor",
+      passwordHash: "salt:hash",
+    });
+    runResults.push({ lastInsertRowid: 5 });
+
+    const user = registerUser({
+      username: "  nurse ",
+      password: "Secure123",
+      role: "instructor",
+    });
+
+    expect(user).toEqual({ id: 5, username: "nurse", role: "instructor" });
+    expect(preparedStatements[0].sql).toContain("SELECT id FROM users");
+    expect(preparedStatements[0].get).toHaveBeenCalledWith("nurse");
+    const insertStmt = preparedStatements[1];
+    expect(insertStmt.sql).toContain("INSERT INTO users");
+    expect(insertStmt.run).toHaveBeenCalledWith(
+      "nurse",
+      "instructor",
+      expect.stringMatching(/^[0-9a-f]+:[0-9a-f]+$/)
+    );
+    expect(preparedStatements[2].sql).toContain("SELECT * FROM users");
+    expect(preparedStatements[2].get).toHaveBeenCalledWith(5);
+  });
+
+  test("registerUser throws if username already exists", () => {
+    getResults.push({ id: 1 });
+    expect(() =>
+      registerUser({ username: "duplicate", password: "Secure123" })
+    ).toThrow("Username already exists");
+  });
+
+  test("authenticateUser returns sanitized user on match", () => {
+    const salt = "0123456789abcdef0123456789abcdef";
+    const hash = scryptSync("Secure123", salt, 64).toString("hex");
+    getResults.push({
+      id: 9,
+      username: "nurse",
+      role: "student",
+      passwordHash: `${salt}:${hash}`,
+    });
+
+    const user = authenticateUser(" nurse ", "Secure123");
+
+    expect(user).toEqual({ id: 9, username: "nurse", role: "student" });
+    expect(preparedStatements[0].sql).toContain("SELECT * FROM users");
+    expect(preparedStatements[0].get).toHaveBeenCalledWith("nurse");
+  });
+
+  test("authenticateUser throws when password mismatches", () => {
+    const salt = "fedcba9876543210fedcba9876543210";
+    const hash = scryptSync("Secure123", salt, 64).toString("hex");
+    getResults.push({
+      id: 2,
+      username: "educator",
+      role: "instructor",
+      passwordHash: `${salt}:${hash}`,
+    });
+
+    expect(() => authenticateUser("educator", "Wrong123")).toThrow(
+      "Invalid username or password"
+    );
   });
 });
 
