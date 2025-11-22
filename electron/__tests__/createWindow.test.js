@@ -25,6 +25,7 @@ async function loadMainModule({ isPackaged = false } = {}) {
 
   const mockDataModels = {
     registerUser: jest.fn(),
+    authenticateUser: jest.fn(),
     getAllScenarios: jest.fn(),
     getScenarioById: jest.fn(),
     addSessionNote: jest.fn(),

@@ -23,6 +23,7 @@ async function loadMainWithScenarioMocks() {
 
   const dataModelMocks = {
     registerUser: jest.fn(),
+    authenticateUser: jest.fn(),
     getAllScenarios: jest.fn(),
     getScenarioById: jest.fn(),
     addSessionNote: jest.fn(),
@@ -151,6 +152,69 @@ describe("scenario IPC handlers", () => {
     const response = await handler(null, 9);
 
     expect(response).toEqual({ success: false, error: "boom" });
+  });
+});
+
+describe("auth IPC handlers", () => {
+  test("register-user returns new user on success", async () => {
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    const mockUser = { id: 4, username: "nurse", role: "student" };
+    dataModelMocks.registerUser.mockReturnValueOnce(mockUser);
+
+    const handler = findHandler(mockIpcHandle, "register-user");
+    const payload = { username: "nurse", password: "Secret1!", role: "student" };
+    const response = await handler(null, payload);
+
+    expect(dataModelMocks.registerUser).toHaveBeenCalledWith(payload);
+    expect(response).toEqual({ success: true, user: mockUser });
+  });
+
+  test("register-user reports underlying errors", async () => {
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    dataModelMocks.registerUser.mockImplementation(() => {
+      throw new Error("taken");
+    });
+
+    const handler = findHandler(mockIpcHandle, "register-user");
+    const response = await handler(null, { username: "dupe" });
+
+    expect(response).toEqual({ success: false, error: "taken" });
+  });
+
+  test("login-user returns authenticated user", async () => {
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    const mockUser = { id: 2, username: "educator", role: "instructor" };
+    dataModelMocks.authenticateUser.mockReturnValueOnce(mockUser);
+
+    const handler = findHandler(mockIpcHandle, "login-user");
+    const response = await handler(null, {
+      username: "educator",
+      password: "StrongPass1!",
+    });
+
+    expect(dataModelMocks.authenticateUser).toHaveBeenCalledWith(
+      "educator",
+      "StrongPass1!"
+    );
+    expect(response).toEqual({ success: true, user: mockUser });
+  });
+
+  test("login-user surfaces authentication failures", async () => {
+    const { mockIpcHandle, dataModelMocks } = await loadMainWithScenarioMocks();
+    dataModelMocks.authenticateUser.mockImplementation(() => {
+      throw new Error("Invalid credentials");
+    });
+
+    const handler = findHandler(mockIpcHandle, "login-user");
+    const response = await handler(null, {
+      username: "educator",
+      password: "bad",
+    });
+
+    expect(response).toEqual({
+      success: false,
+      error: "Invalid credentials",
+    });
   });
 });
 

@@ -1,0 +1,100 @@
+.sign-in-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ehr-spacing-xl);
+}
+
+.sign-in-card {
+  background-color: var(--ehr-bg-primary);
+  border: 1px solid var(--ehr-border);
+  border-radius: var(--ehr-radius-lg);
+  padding: var(--ehr-spacing-2xl);
+  box-shadow: var(--ehr-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ehr-spacing-lg);
+}
+
+.sign-in-card h1 {
+  margin-bottom: 0;
+}
+
+.sign-in-subtitle {
+  font-size: 1.05rem;
+  color: var(--ehr-text-secondary);
+  margin: 0;
+}
+
+.auth-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ehr-spacing-sm);
+}
+
+.auth-toggle button {
+  background-color: var(--ehr-bg-tertiary);
+  color: var(--ehr-text-secondary);
+  border: 1px solid var(--ehr-border);
+  border-radius: var(--ehr-radius-md);
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+}
+
+.auth-toggle button.active {
+  background-color: var(--ehr-primary);
+  color: var(--ehr-text-inverse);
+  border-color: var(--ehr-primary);
+}
+
+.sign-in-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ehr-spacing-md);
+}
+
+.sign-in-form label {
+  font-weight: 600;
+  color: var(--ehr-text-primary);
+}
+
+.sign-in-form input,
+.sign-in-form select {
+  width: 100%;
+}
+
+.role-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ehr-spacing-sm);
+}
+
+.role-toggle button {
+  border: 1px solid var(--ehr-border);
+  background-color: var(--ehr-bg-tertiary);
+  color: var(--ehr-text-secondary);
+  border-radius: var(--ehr-radius-md);
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+}
+
+.role-toggle button.active {
+  background-color: var(--ehr-primary);
+  color: var(--ehr-text-inverse);
+  border-color: var(--ehr-primary);
+}
+
+.form-error {
+  color: var(--ehr-error);
+  font-weight: 500;
+  margin: 0;
+}
+
+.sign-in-form button {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .sign-in-card {
+    padding: var(--ehr-spacing-lg);
+  }
+}

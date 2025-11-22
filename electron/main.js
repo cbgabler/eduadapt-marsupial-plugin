@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { initDatabase } from "./database/database.js";
 import {
+  authenticateUser,
   registerUser,
   getAllScenarios,
   getScenarioById,
@@ -29,25 +30,30 @@ const __dirname = path.dirname(__filename);
 const isDev = !app.isPackaged; // for dev vs prod, should be changed later
 
 // IPC handlers
-ipcMain.handle(
-  "register-user",
-  async (event, { first_name, last_name, username, email }) => {
-    try {
-      console.log("Registering user:", {
-        first_name,
-        last_name,
-        username,
-        email,
-      });
-      const userId = registerUser(first_name, last_name, username, email);
-      console.log("User registered successfully with ID:", userId);
-      return { success: true, userId };
-    } catch (error) {
-      console.error("Error registering user:", error);
-      return { success: false, error: error.message };
-    }
+ipcMain.handle("register-user", async (event, payload = {}) => {
+  try {
+    console.log("Registering user:", {
+      username: payload.username,
+    });
+    const user = registerUser(payload);
+    console.log("User registered successfully with ID:", user?.id);
+    return { success: true, user };
+  } catch (error) {
+    console.error("Error registering user:", error);
+    return { success: false, error: error.message };
   }
-);
+});
+
+ipcMain.handle("login-user", async (event, payload = {}) => {
+  try {
+    const { username, password } = payload;
+    const user = authenticateUser(username, password);
+    return { success: true, user };
+  } catch (error) {
+    console.error("Error logging in:", error);
+    return { success: false, error: error.message };
+  }
+});
 
 // Scenario handlers
 ipcMain.handle("get-all-scenarios", async () => {

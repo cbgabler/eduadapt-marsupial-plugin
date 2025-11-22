@@ -14,11 +14,9 @@ export function initDatabase() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY,
-      first_name VARCHAR,
-      last_name VARCHAR,
-      username TEXT UNIQUE,
-      role TEXT DEFAULT 'student' CHECK(role IN ('student', 'instructor', 'admin')),
-      email VARCHAR UNIQUE
+      username TEXT UNIQUE NOT NULL,
+      role TEXT NOT NULL DEFAULT 'student' CHECK(role IN ('student', 'instructor', 'admin')),
+      passwordHash TEXT
     );
 
     CREATE TABLE IF NOT EXISTS scenarios (
