@@ -5,6 +5,9 @@ import { error } from "console";
 
 let db;
 
+// Current version
+const SCHEMA_VERSION = "v1.1.0";
+
 // Initializes the current database if it doesn't already exist
 export function initDatabase() {
   const dbPath = path.join(app.getPath("userData"), "ehr_scenarios.db");
@@ -12,6 +15,10 @@ export function initDatabase() {
 
   // Build table if not exists
   db.exec(`
+    CREATE TABLE IF NOT EXISTS schema_version (
+      version TEXT PRIMARY KEY
+    );
+
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
@@ -74,4 +81,17 @@ export function getDb() {
     throw new error("DB failed to initialize.");
   }
   return db;
+}
+
+export function checkSchema() {
+  const db = getDb();
+
+  if (!db) {
+    throw new error("DB failed to initialize.");
+  }
+
+  const CURRENT_VERSION = db.exec(`SELECT * FROM schema_version`);
+  if (CURRENT_VERSION != SCHEMA_VERSION) {
+    db.exec();
+  }
 }
