@@ -23,16 +23,6 @@ async function loadMainModule({ isPackaged = false } = {}) {
     get: () => isPackaged,
   });
 
-  const mockDataModels = {
-    registerUser: jest.fn(),
-    authenticateUser: jest.fn(),
-    getAllScenarios: jest.fn(),
-    getScenarioById: jest.fn(),
-    addSessionNote: jest.fn(),
-    getSessionNotes: jest.fn(),
-    deleteSessionNote: jest.fn(),
-  };
-
   await jest.unstable_mockModule("electron", () => ({
     app: mockApp,
     BrowserWindow: mockBrowserWindow,
@@ -50,10 +40,21 @@ async function loadMainModule({ isPackaged = false } = {}) {
     getDb: jest.fn(),
   }));
 
-  await jest.unstable_mockModule(
-    "../database/dataModels.js",
-    () => mockDataModels
-  );
+  await jest.unstable_mockModule("../database/models/users.js", () => ({
+    registerUser: jest.fn(),
+    authenticateUser: jest.fn(),
+  }));
+
+  await jest.unstable_mockModule("../database/models/scenarios.js", () => ({
+    getAllScenarios: jest.fn(),
+    getScenarioById: jest.fn(),
+  }));
+
+  await jest.unstable_mockModule("../database/models/sessions.js", () => ({
+    addSessionNote: jest.fn(),
+    getSessionNotes: jest.fn(),
+    deleteSessionNote: jest.fn(),
+  }));
 
   await jest.unstable_mockModule("../database/exampleScenarios.js", () => ({
     seedExampleScenarios: jest.fn(),

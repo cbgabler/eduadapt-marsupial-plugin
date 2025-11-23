@@ -510,7 +510,9 @@ export function getExampleDiabetesScenario() {
  */
 export async function seedExampleScenarios() {
   // Dynamic import to avoid circular dependency
-  const { createScenario, getAllScenarios } = await import("./dataModels.js");
+  const { createScenario, getAllScenarios } = await import(
+    "./models/scenarios.js"
+  );
 
   // Check if scenarios already exist
   const existingScenarios = getAllScenarios();

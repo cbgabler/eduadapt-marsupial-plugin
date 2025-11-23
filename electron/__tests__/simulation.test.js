@@ -83,7 +83,7 @@ async function loadSimulationModule() {
   await jest.unstable_mockModule("../database/database.js", () => ({
     getDb: mockGetDb,
   }));
-  await jest.unstable_mockModule("../database/dataModels.js", () => ({
+  await jest.unstable_mockModule("../database/models/scenarios.js", () => ({
     getScenarioById: mockGetScenarioById,
   }));
   const module = await import("../database/simulation.js");

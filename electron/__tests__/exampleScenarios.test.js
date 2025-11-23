@@ -3,7 +3,7 @@ import { jest } from "@jest/globals";
 const mockCreateScenario = jest.fn();
 const mockGetAllScenarios = jest.fn();
 
-await jest.unstable_mockModule("../database/dataModels.js", () => ({
+await jest.unstable_mockModule("../database/models/scenarios.js", () => ({
   createScenario: mockCreateScenario,
   getAllScenarios: mockGetAllScenarios,
 }));
@@ -63,7 +63,9 @@ describe("seedExampleScenarios", () => {
       })
       .mockReturnValueOnce(11);
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     const result = await seedExampleScenarios();
 
