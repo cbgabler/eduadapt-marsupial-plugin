@@ -2,10 +2,14 @@ function ScenarioDetailsModal({
   scenario,
   onClose,
   onStartScenario,
+  onDeleteScenario,
   isStarting,
   startError,
   currentUser,
+  isDeleting,
+  deleteError,
 }) {
+  const isInstructor = currentUser?.role === "instructor" || currentUser?.role === "admin";
   const definition = scenario.definition || {};
   const patient = definition.patient || {};
   const vitals = definition.vitals?.current || {};
@@ -213,6 +217,21 @@ function ScenarioDetailsModal({
             {startError && <p className="start-error">{startError}</p>}
           </div>
           <div className="modal-actions">
+            {isInstructor && (
+              <button
+                className="modal-button"
+                type="button"
+                onClick={() => onDeleteScenario?.(scenario.id)}
+                disabled={isDeleting}
+                style={{
+                  backgroundColor: "var(--ehr-error)",
+                  color: "var(--ehr-text-inverse)",
+                  marginRight: "auto",
+                }}
+              >
+                {isDeleting ? "Deleting..." : "Delete Scenario"}
+              </button>
+            )}
             <button className="modal-button secondary" onClick={onClose} type="button">
               Close
             </button>
@@ -220,11 +239,24 @@ function ScenarioDetailsModal({
               className="modal-button primary"
               type="button"
               onClick={() => onStartScenario?.(scenario)}
-              disabled={isStarting}
+              disabled={isStarting || isDeleting}
             >
               {isStarting ? "Starting..." : "Start Scenario"}
             </button>
           </div>
+          {deleteError && (
+            <div
+              style={{
+                padding: "var(--ehr-spacing-md)",
+                borderRadius: "var(--ehr-radius-md)",
+                backgroundColor: "rgba(239, 68, 68, 0.1)",
+                color: "var(--ehr-error)",
+                marginTop: "var(--ehr-spacing-md)",
+              }}
+            >
+              {deleteError}
+            </div>
+          )}
         </div>
       </div>
     </div>

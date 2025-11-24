@@ -13,6 +13,7 @@ import {
 import {
   getAllScenarios,
   getScenarioById,
+  deleteScenario,
 } from "./database/models/scenarios.js"
 
 // Sessions
@@ -89,6 +90,22 @@ ipcMain.handle("get-scenario", async (event, scenarioId) => {
     return { success: true, scenario };
   } catch (error) {
     console.error("Error getting scenario:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("delete-scenario", async (event, scenarioId) => {
+  try {
+    if (!scenarioId) {
+      throw new Error("scenarioId is required");
+    }
+    const deleted = deleteScenario(scenarioId);
+    if (!deleted) {
+      return { success: false, error: "Scenario not found" };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting scenario:", error);
     return { success: false, error: error.message };
   }
 });
