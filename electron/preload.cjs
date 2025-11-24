@@ -41,6 +41,14 @@ contextBridge.exposeInMainWorld("api", {
       return { success: false, error: error.message };
     }
   },
+  createScenario: async ({ name, definition }) => {
+    try {
+      return await ipcRenderer.invoke("create-scenario", { name, definition });
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { success: false, error: error.message };
+    }
+  },
   startSimulation: async ({ scenarioId, userId }) => {
     try {
       return await ipcRenderer.invoke("start-sim", { scenarioId, userId });

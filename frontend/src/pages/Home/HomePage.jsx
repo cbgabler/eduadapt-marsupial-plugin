@@ -6,6 +6,7 @@ import ScenarioDetailsModal from "./components/ScenarioDetailsModal.jsx";
 import ActiveSimulationPanel from "./components/ActiveSimulationPanel.jsx";
 import ImportModal from "./components/ImportModal.jsx";
 import ExportModal from "./components/ExportModal.jsx";
+import CreateScenarioModal from "./components/CreateScenarioModal.jsx";
 import "./HomePage.css";
 
 const POLL_INTERVAL_MS = 2500;
@@ -30,6 +31,7 @@ function HomePage() {
   const [noteDeletingId, setNoteDeletingId] = useState(null);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showCreateScenarioModal, setShowCreateScenarioModal] = useState(false);
 
   const pollingRef = useRef(null);
   const sessionUserIdRef = useRef(null);
@@ -127,6 +129,8 @@ function HomePage() {
   const closeImportModal = () => setShowImportModal(false);
   const openExportModal = () => setShowExportModal(true);
   const closeExportModal = () => setShowExportModal(false);
+  const openCreateScenarioModal = () => setShowCreateScenarioModal(true);
+  const closeCreateScenarioModal = () => setShowCreateScenarioModal(false);
 
   const loadNotes = useCallback(async (sessionId) => {
     if (!window.api?.getNotes || !sessionId) {
@@ -443,9 +447,16 @@ function HomePage() {
     );
   }
 
+  const isInstructor = user?.role === "instructor" || user?.role === "admin";
+
   return (
     <div className="page-container">
       <div className="scenario-actions">
+        {isInstructor && (
+          <button type="button" onClick={openCreateScenarioModal}>
+            Create Scenario
+          </button>
+        )}
         <button type="button" onClick={openExportModal}>
           Export
         </button>
@@ -510,6 +521,12 @@ function HomePage() {
         <ImportModal onClose={closeImportModal} onImportSuccess={loadScenarios} />
       )}
       {showExportModal && <ExportModal onClose={closeExportModal} />}
+      {showCreateScenarioModal && (
+        <CreateScenarioModal
+          onClose={closeCreateScenarioModal}
+          onCreateSuccess={loadScenarios}
+        />
+      )}
     </div>
   );
 }
