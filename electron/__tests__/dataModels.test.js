@@ -14,18 +14,21 @@ await jest.unstable_mockModule("../database/database.js", () => ({
   getDb: mockGetDb,
 }));
 
+const { registerUser, authenticateUser } = await import(
+  "../database/models/users.js"
+);
+
 const {
-  registerUser,
-  authenticateUser,
   createScenario,
   getScenarioById,
   getAllScenarios,
   updateScenario,
   deleteScenario,
-  addSessionNote,
-  getSessionNotes,
-  deleteSessionNote,
-} = await import("../database/dataModels.js");
+} = await import("../database/models/scenarios.js");
+
+const { addSessionNote, getSessionNotes, deleteSessionNote } = await import(
+  "../database/models/sessions.js"
+);
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -167,7 +170,7 @@ describe("scenario data model helpers", () => {
     const scenarios = getAllScenarios();
 
     expect(scenarios).toEqual([
-      { id: 1, name: "One", definition: { testing: "good" }},
+      { id: 1, name: "One", definition: { testing: "good" } },
       { id: 2, name: "Two", definition: null },
     ]);
     const statement = preparedStatements[0];
@@ -216,12 +219,9 @@ describe("session notes helpers", () => {
   test("addSessionNote stores sanitized content and returns payload", () => {
     const mockNow = "2024-01-01T00:00:00.000Z";
     runResults.push({ lastInsertRowid: 42 });
-    const dateSpy = jest.spyOn(global, "Date").mockImplementation(
-      () =>
-        ({
-          toISOString: () => mockNow,
-        })
-    );
+    const dateSpy = jest.spyOn(global, "Date").mockImplementation(() => ({
+      toISOString: () => mockNow,
+    }));
 
     const note = addSessionNote({
       sessionId: 9,
@@ -319,8 +319,8 @@ describe("session notes helpers", () => {
 
     // Now test forbidden deletion
     getResults.push(noteRow);
-    expect(() =>
-      deleteSessionNote({ noteId: 5, userId: 10 })
-    ).toThrow("You do not have permission");
+    expect(() => deleteSessionNote({ noteId: 5, userId: 10 })).toThrow(
+      "You do not have permission"
+    );
   });
 });
