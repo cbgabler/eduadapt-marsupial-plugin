@@ -29,6 +29,7 @@ async function loadMainWithScenarioMocks() {
   const scenarioMocks = {
     getAllScenarios: jest.fn(),
     getScenarioById: jest.fn(),
+    deleteScenario: jest.fn(),
   };
 
   const sessionMocks = {

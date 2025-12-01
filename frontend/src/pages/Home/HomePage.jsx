@@ -32,6 +32,8 @@ function HomePage() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showCreateScenarioModal, setShowCreateScenarioModal] = useState(false);
+  const [deletingScenarioId, setDeletingScenarioId] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
 
   const pollingRef = useRef(null);
   const sessionUserIdRef = useRef(null);
@@ -117,6 +119,37 @@ function HomePage() {
       }
     } catch (err) {
       setError(err.message || "An unexpected error occurred");
+    }
+  };
+
+  const handleDeleteScenario = async (scenarioId) => {
+    if (!window.confirm("Are you sure you want to delete this scenario? This action cannot be undone.")) {
+      return;
+    }
+
+    setDeletingScenarioId(scenarioId);
+    setDeleteError(null);
+    try {
+      if (!window.api?.deleteScenario) {
+        setDeleteError("Electron API not available.");
+        setDeletingScenarioId(null);
+        return;
+      }
+      const result = await window.api.deleteScenario(scenarioId);
+      if (result.success) {
+        // Close modal if the deleted scenario is currently selected
+        if (selectedScenario?.id === scenarioId) {
+          setSelectedScenario(null);
+        }
+        // Refresh scenarios list
+        await loadScenarios();
+      } else {
+        setDeleteError(result.error || "Failed to delete scenario");
+      }
+    } catch (err) {
+      setDeleteError(err.message || "An unexpected error occurred");
+    } finally {
+      setDeletingScenarioId(null);
     }
   };
 
@@ -511,9 +544,12 @@ function HomePage() {
           scenario={selectedScenario}
           onClose={closeScenarioDetails}
           onStartScenario={handleStartScenario}
+          onDeleteScenario={handleDeleteScenario}
           isStarting={isStarting}
           startError={startError}
           currentUser={user}
+          isDeleting={deletingScenarioId === selectedScenario.id}
+          deleteError={deleteError}
         />
       )}
 

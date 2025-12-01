@@ -49,6 +49,14 @@ contextBridge.exposeInMainWorld("api", {
       return { success: false, error: error.message };
     }
   },
+  deleteScenario: async (scenarioId) => {
+    try {
+      return await ipcRenderer.invoke("delete-scenario", scenarioId);
+    } catch (error) {
+      console.error("IPC error:", error);
+      return { success: false, error: error.message };
+    }
+  },
   startSimulation: async ({ scenarioId, userId }) => {
     try {
       return await ipcRenderer.invoke("start-sim", { scenarioId, userId });
