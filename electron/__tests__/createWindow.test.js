@@ -49,6 +49,7 @@ async function loadMainModule({ isPackaged = false } = {}) {
     getAllScenarios: jest.fn(),
     getScenarioById: jest.fn(),
     deleteScenario: jest.fn(),
+    createScenario: jest.fn(),
   }));
 
   await jest.unstable_mockModule("../database/models/sessions.js", () => ({
