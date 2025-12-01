@@ -13,6 +13,7 @@ import {
 import {
   getAllScenarios,
   getScenarioById,
+  createScenario,
   deleteScenario,
 } from "./database/models/scenarios.js"
 
@@ -90,6 +91,20 @@ ipcMain.handle("get-scenario", async (event, scenarioId) => {
     return { success: true, scenario };
   } catch (error) {
     console.error("Error getting scenario:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("create-scenario", async (event, payload) => {
+  try {
+    const { name, definition } = payload ?? {};
+    if (!name || !definition) {
+      throw new Error("name and definition are required");
+    }
+    const scenarioId = createScenario(name, definition);
+    return { success: true, scenarioId };
+  } catch (error) {
+    console.error("Error creating scenario:", error);
     return { success: false, error: error.message };
   }
 });
