@@ -48,8 +48,12 @@ const isDev = !app.isPackaged; // for dev vs prod, should be changed later
 // IPC handlers
 ipcMain.handle("register-user", async (event, payload = {}) => {
   try {
+    const username = payload ?? {};
+    if (!username) {
+      throw new Error("Username missing");
+    }
     console.log("Registering user:", {
-      username: payload.username,
+      username
     });
     const user = registerUser(payload);
     console.log("User registered successfully with ID:", user?.id);
@@ -62,7 +66,10 @@ ipcMain.handle("register-user", async (event, payload = {}) => {
 
 ipcMain.handle("login-user", async (event, payload = {}) => {
   try {
-    const { username, password } = payload;
+    const { username, password } = payload ?? {};
+    if (!username || !password) {
+      throw new Error("Username or Password missing");
+    }
     const user = authenticateUser(username, password);
     return { success: true, user };
   } catch (error) {
@@ -95,7 +102,7 @@ ipcMain.handle("get-scenario", async (event, scenarioId) => {
   }
 });
 
-ipcMain.handle("create-scenario", async (event, payload) => {
+ipcMain.handle("create-scenario", async (event, payload = {}) => {
   try {
     const { name, definition } = payload ?? {};
     if (!name || !definition) {
@@ -126,7 +133,7 @@ ipcMain.handle("delete-scenario", async (event, scenarioId) => {
 });
 
 // Simulation handlers
-ipcMain.handle("start-sim", async (event, payload) => {
+ipcMain.handle("start-sim", async (event, payload = {}) => {
   try {
     const { scenarioId, userId } = payload ?? {};
     if (!scenarioId || !userId) {
@@ -140,7 +147,7 @@ ipcMain.handle("start-sim", async (event, payload) => {
   }
 });
 
-ipcMain.handle("get-sim-state", async (event, payload) => {
+ipcMain.handle("get-sim-state", async (event, payload = {}) => {
   try {
     const { sessionId } = payload ?? {};
     if (!sessionId) {
@@ -154,7 +161,7 @@ ipcMain.handle("get-sim-state", async (event, payload) => {
   }
 });
 
-ipcMain.handle("adjust-sim-medication", async (event, payload) => {
+ipcMain.handle("adjust-sim-medication", async (event, payload = {}) => {
   try {
     const { sessionId, medicationId, newDose } = payload ?? {};
     if (!sessionId || !medicationId || typeof newDose !== "number") {
@@ -170,7 +177,7 @@ ipcMain.handle("adjust-sim-medication", async (event, payload) => {
   }
 });
 
-ipcMain.handle("pause-sim", async (event, payload) => {
+ipcMain.handle("pause-sim", async (event, payload = {}) => {
   try {
     const { sessionId } = payload ?? {};
     if (!sessionId) {
@@ -184,7 +191,7 @@ ipcMain.handle("pause-sim", async (event, payload) => {
   }
 });
 
-ipcMain.handle("resume-sim", async (event, payload) => {
+ipcMain.handle("resume-sim", async (event, payload = {}) => {
   try {
     const { sessionId } = payload ?? {};
     if (!sessionId) {
@@ -198,7 +205,7 @@ ipcMain.handle("resume-sim", async (event, payload) => {
   }
 });
 
-ipcMain.handle("end-sim", async (event, payload) => {
+ipcMain.handle("end-sim", async (event, payload = {}) => {
   try {
     const { sessionId } = payload ?? {};
     if (!sessionId) {
@@ -213,7 +220,7 @@ ipcMain.handle("end-sim", async (event, payload) => {
 });
 
 // Documentation handlers
-ipcMain.handle("add-note", async (event, payload) => {
+ipcMain.handle("add-note", async (event, payload = {}) => {
   try {
     const { sessionId, userId, content, vitalsSnapshot } = payload ?? {};
     if (!sessionId || !userId || !content?.trim()) {
@@ -236,7 +243,7 @@ ipcMain.handle("add-note", async (event, payload) => {
   }
 });
 
-ipcMain.handle("get-notes", async (event, payload) => {
+ipcMain.handle("get-notes", async (event, payload = {}) => {
   try {
     const { sessionId } = payload ?? {};
     if (!sessionId) {
@@ -250,7 +257,7 @@ ipcMain.handle("get-notes", async (event, payload) => {
   }
 });
 
-ipcMain.handle("delete-note", async (event, payload) => {
+ipcMain.handle("delete-note", async (event, payload = {}) => {
   try {
     const { noteId, userId } = payload ?? {};
     if (!noteId) {
@@ -298,9 +305,13 @@ ipcMain.handle("import-file", async (event, filePath) => {
   }
 });
 
-ipcMain.handle("export-data", async (event, filePath) => {
+ipcMain.handle("export-data", async (event, payload = {}) => {
   try {
-    const result = exportData(filePath);
+    const { filePath, scenarioIds } = payload ?? {};
+    if (!filePath || !scenarioIds) {
+      throw new Error("filePath or scenarioIds missing");
+    }
+    const result = exportData(filePath, scenarioIds);
     return result;
   } catch (error) {
     console.error("Error exporting data:", error);

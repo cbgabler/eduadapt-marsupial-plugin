@@ -556,7 +556,7 @@ function HomePage() {
       {showImportModal && (
         <ImportModal onClose={closeImportModal} onImportSuccess={loadScenarios} />
       )}
-      {showExportModal && <ExportModal onClose={closeExportModal} />}
+      {showExportModal && <ExportModal onClose={closeExportModal} scenarios={scenarios} />}
       {showCreateScenarioModal && (
         <CreateScenarioModal
           onClose={closeCreateScenarioModal}

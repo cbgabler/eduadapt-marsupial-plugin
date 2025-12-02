@@ -162,9 +162,9 @@ contextBridge.exposeInMainWorld("api", {
       return { canceled: true, error: error.message };
     }
   },
-  exportData: async (filePath) => {
+  exportData: async ({ filePath, scenarioIds }) => {
     try {
-      return await ipcRenderer.invoke("export-data", filePath);
+      return await ipcRenderer.invoke("export-data", { filePath, scenarioIds });
     } catch (error) {
       console.error("IPC error:", error);
       return { success: false, error: error.message };

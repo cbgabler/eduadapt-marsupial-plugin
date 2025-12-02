@@ -3,11 +3,13 @@ import { app } from "electron";
 import Database from "better-sqlite3";
 import { error } from "console";
 
+const defaultDbPath = path.join(app.getPath("userData"), "ehr_scenarios.db");
+
 let db;
 
 // Initializes the current database if it doesn't already exist
-export function initDatabase() {
-  const dbPath = path.join(app.getPath("userData"), "ehr_scenarios.db");
+// @param {string} [customDbPath] - Optional path to database file. Defaults to the main database path.
+export function initDatabase(dbPath = defaultDbPath) {
   db = new Database(dbPath);
 
   // Build table if not exists

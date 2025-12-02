@@ -1,10 +1,19 @@
 import { useState } from "react";
 
-function ExportModal({ onClose }) {
+function ExportModal({ onClose, scenarios }) {
   const [filePath, setFilePath] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedScenarios, setSelectedScenarios] = useState([]);
   const isSuccessMessage = message.toLowerCase().includes("success");
+
+  const handleCheckboxChange = (id) => {
+    setSelectedScenarios((prev) =>
+      prev.includes(id)
+        ? prev.filter((sid) => sid !== id)
+        : [...prev, id]
+    );
+  };
 
   const handleFileSelect = async () => {
     try {
@@ -46,7 +55,15 @@ function ExportModal({ onClose }) {
         setIsLoading(false);
         return;
       }
-      const result = await window.api.exportData(filePath);
+      if (selectedScenarios.length === 0) {
+        setMessage("Please select the scenario(s) you would like to export.");
+        setIsLoading(false);
+        return;
+      }
+      const result = await window.api.exportData({
+        filePath,
+        scenarioIds: selectedScenarios,
+      });
       if (result.success) {
         setMessage("Export successful! Scenarios have been exported.");
         setTimeout(() => {
@@ -74,6 +91,18 @@ function ExportModal({ onClose }) {
 
         <div className="modal-body">
           <form onSubmit={handleSubmit}>
+            <div className="scenario-list">
+                {scenarios.map((scenario) => (
+                  <label key={scenario.id} style={{ display: "block", marginBottom: "8px" }}>
+                    <input
+                      type="checkbox"
+                      checked={selectedScenarios.includes(scenario.id)}
+                      onChange={() => handleCheckboxChange(scenario.id)}
+                    />
+                    {scenario.name}
+                  </label>
+                ))}
+            </div>
             <div style={{ marginBottom: "var(--ehr-spacing-lg)" }}>
               <label
                 style={{
