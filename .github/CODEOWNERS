@@ -1,5 +1,7 @@
-* @cbgabler
-* @thientu745
-* @20apaumier
-* @treyspringer
-* @kwispy7876
+# Update when we have more structure on the owners of certain features. For example */electron/** assigns the primary reviewers from the backend team.
+
+# * @cbgabler
+# */electron/** @thientu745
+# */electron/** @20apaumier
+# * @treyspringer
+# * @kwispy7876
