@@ -4,21 +4,24 @@ import { fileURLToPath } from "url";
 import { initDatabase } from "./database/database.js";
 
 // Users
-import { authenticateUser, registerUser } from "./database/models/users.js";
+import { 
+  authenticateUser, 
+  registerUser 
+} from "./database/models/users.js";
 
 // Scenarios
 import {
   getAllScenarios,
   getScenarioById,
   createScenario,
-  deleteScenario,
+  deleteScenario
 } from "./database/models/scenarios.js";
 
 // Sessions
 import {
   addSessionNote,
   getSessionNotes,
-  deleteSessionNote,
+  deleteSessionNote
 } from "./database/models/sessions.js";
 
 // Simulation deps
