@@ -31,8 +31,8 @@ export function initDatabase() {
       createdBy INTEGER,
       isPublished BOOLEAN DEFAULT 0,
       publishDate DATETIME,
-      FOREIGN KEY (scenarioId) REFERENCES scenarios(id),
-      FOREIGN KEY (createdBy) REFERENCES users(id)
+      FOREIGN KEY (scenarioId) REFERENCES scenarios(id) ON DELETE CASCADE,
+      FOREIGN KEY (createdBy) REFERENCES users(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS scenario_tabs (
@@ -41,7 +41,7 @@ export function initDatabase() {
       name TEXT,
       content TEXT,
       orderIndex INTEGER,
-      FOREIGN KEY (scenarioId) REFERENCES scenarios(id)
+      FOREIGN KEY (scenarioId) REFERENCES scenarios(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS sessions (
@@ -50,8 +50,8 @@ export function initDatabase() {
       userId INTEGER,
       started DATETIME,
       ended DATETIME,
-      FOREIGN KEY (scenarioId) REFERENCES scenarios(id),
-      FOREIGN KEY (userId) REFERENCES users(id)
+      FOREIGN KEY (scenarioId) REFERENCES scenarios(id) ON DELETE CASCADE,
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS notes (
@@ -61,8 +61,8 @@ export function initDatabase() {
       content TEXT,
       vitalsSnapshot TEXT,
       createdAt DATETIME,
-      FOREIGN KEY (sessionId) REFERENCES sessions(id),
-      FOREIGN KEY (userId) REFERENCES users(id)
+      FOREIGN KEY (sessionId) REFERENCES sessions(id) ON DELETE CASCADE,
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
   `);
 
